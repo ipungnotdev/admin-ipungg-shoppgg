@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>ADMIN PANEL</title>
+<title>ADMIN STORE</title>
 
 <style>
 
@@ -12,7 +12,7 @@
 margin:0;
 padding:0;
 box-sizing:border-box;
-font-family:Arial;
+font-family:Arial,sans-serif;
 }
 
 body{
@@ -34,26 +34,21 @@ border-radius:20px;
 margin-bottom:20px;
 }
 
-h1{
+h1,h2{
 margin-bottom:20px;
-}
-
-h2{
-margin-bottom:15px;
-font-size:20px;
 }
 
 input,
 select{
 width:100%;
 padding:14px;
-margin-bottom:12px;
+margin-bottom:14px;
 border:none;
 border-radius:12px;
 background:#0b0515;
+border:1px solid #2d1a4b;
 color:white;
 outline:none;
-border:1px solid #2c1847;
 }
 
 button{
@@ -74,28 +69,28 @@ opacity:.9;
 
 .preview-banner{
 margin-top:15px;
-border-radius:16px;
 overflow:hidden;
+border-radius:16px;
 border:1px solid #2d1a4b;
 }
 
 .preview-banner img,
 .preview-banner video{
 width:100%;
-display:block;
 max-height:280px;
 object-fit:cover;
+display:block;
 }
 
 .product-card{
-background:#0b0515;
-border:1px solid #24113d;
-padding:15px;
-border-radius:16px;
-margin-top:12px;
 display:flex;
 gap:15px;
 align-items:center;
+padding:15px;
+border-radius:16px;
+background:#0b0515;
+border:1px solid #24113d;
+margin-top:12px;
 }
 
 .product-card img{
@@ -111,13 +106,13 @@ flex:1;
 
 .pin-badge{
 display:inline-block;
-padding:5px 10px;
+padding:6px 12px;
+border-radius:50px;
 background:#ffb300;
 color:black;
 font-size:12px;
-border-radius:50px;
-margin-top:6px;
 font-weight:bold;
+margin-top:6px;
 }
 
 .checkbox-wrap{
@@ -130,15 +125,15 @@ margin-bottom:15px;
 .checkbox-wrap input{
 width:auto;
 margin:0;
-transform:scale(1.3);
+transform:scale(1.2);
 }
 
 .category-item{
 padding:12px;
-background:#0b0515;
 border-radius:12px;
-margin-top:10px;
+background:#0b0515;
 border:1px solid #24113d;
+margin-top:10px;
 }
 
 #adminPanel{
@@ -151,7 +146,8 @@ display:none;
 
 <div class="container">
 
-<div id="loginBox" class="card">
+<!-- LOGIN -->
+<div class="card" id="loginBox">
 
 <h1>LOGIN ADMIN</h1>
 
@@ -173,31 +169,57 @@ LOGIN
 
 </div>
 
+
+<!-- ADMIN PANEL -->
 <div id="adminPanel">
 
 <div class="card">
 
 <h1>⚙️ ADMIN STORE</h1>
 
-<input type="text" id="storeName" placeholder="Nama Store">
+<input
+type="text"
+id="storeName"
+placeholder="Nama Store"
+>
 
-<input type="text" id="bannerUrl" placeholder="URL Banner IMG / MP4">
+<input
+type="text"
+id="bannerUrl"
+placeholder="URL Banner IMG / MP4"
+>
 
-<input type="text" id="urlAdmin" placeholder="URL Admin">
+<input
+type="text"
+id="urlAdmin"
+placeholder="URL Admin"
+>
 
-<input type="text" id="urlChannel" placeholder="URL Channel">
+<input
+type="text"
+id="urlChannel"
+placeholder="URL Channel"
+>
 
-<input type="text" id="urlGroup" placeholder="URL Grup">
+<input
+type="text"
+id="urlGroup"
+placeholder="URL Grup"
+>
 
 <button onclick="saveSettings()">
 SIMPAN SETTINGS
 </button>
 
-<div class="preview-banner" id="bannerPreview"></div>
+<div
+class="preview-banner"
+id="bannerPreview"
+></div>
 
 </div>
 
 
+<!-- KATEGORI -->
 <div class="card">
 
 <h2>TAMBAH KATEGORI</h2>
@@ -205,7 +227,7 @@ SIMPAN SETTINGS
 <input
 type="text"
 id="categoryName"
-placeholder="Nama kategori"
+placeholder="Nama Kategori"
 >
 
 <button onclick="addCategory()">
@@ -217,6 +239,7 @@ TAMBAH KATEGORI
 </div>
 
 
+<!-- PRODUK -->
 <div class="card">
 
 <h2>TAMBAH PRODUK</h2>
@@ -301,12 +324,14 @@ from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 const firebaseConfig = {
 
-apiKey: "AIzaSyA9tSehgxD2Pgb7YPy7Pq-_bcuKLKswyos",
+apiKey:
+"AIzaSyA9tSehgxD2Pgb7YPy7Pq-_bcuKLKswyos",
 
 authDomain:
 "ipung-store-2b96d.firebaseapp.com",
 
-databaseURL"https://ipung-store-2b96d-default-rtdb.asia-southeast1.firebasedatabase.app",
+databaseURL:
+"https://ipung-store-2b96d-default-rtdb.asia-southeast1.firebasedatabase.app",
 
 projectId:
 "ipung-store-2b96d",
@@ -318,21 +343,21 @@ messagingSenderId:
 "906202337063",
 
 appId:
-"1:906202337063:web:1a39b7bad99a85b23c2302"
+"1:906202337063:web:1a39b7bad99a85b23c2302",
+
+measurementId:
+"G-XJZ3S6FNE5"
 
 };
 
 
 // ================= INIT =================
 
-const app =
-initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
 
-const db =
-getDatabase(app);
+const db = getDatabase(app);
 
-const auth =
-getAuth(app);
+const auth = getAuth(app);
 
 
 // ================= LOGIN =================
@@ -366,6 +391,8 @@ alert("Login berhasil");
 }catch(err){
 
 alert(err.message);
+
+console.log(err);
 
 }
 
@@ -421,7 +448,7 @@ products:{}
 };
 
 
-// ================= LOAD STORE =================
+// ================= LOAD =================
 
 function loadStore(){
 
@@ -436,8 +463,11 @@ storeData = data;
 }
 
 renderSettings();
-renderBannerPreview();
+
+renderBanner();
+
 renderCategories();
+
 renderProducts();
 
 });
@@ -445,29 +475,7 @@ renderProducts();
 }
 
 
-// ================= RENDER SETTINGS =================
-
-function renderSettings(){
-
-document.getElementById("storeName").value =
-storeData.settings?.storeName || "";
-
-document.getElementById("bannerUrl").value =
-storeData.settings?.banner || "";
-
-document.getElementById("urlAdmin").value =
-storeData.settings?.urlAdmin || "";
-
-document.getElementById("urlChannel").value =
-storeData.settings?.urlChannel || "";
-
-document.getElementById("urlGroup").value =
-storeData.settings?.urlGroup || "";
-
-}
-
-
-// ================= SAVE SETTINGS =================
+// ================= SETTINGS =================
 
 window.saveSettings = async function(){
 
@@ -495,14 +503,36 @@ ref(db,"store/settings"),
 settings
 );
 
-alert("Settings berhasil disimpan");
+alert("Settings berhasil");
 
 };
 
 
+// ================= RENDER SETTINGS =================
+
+function renderSettings(){
+
+document.getElementById("storeName").value =
+storeData.settings?.storeName || "";
+
+document.getElementById("bannerUrl").value =
+storeData.settings?.banner || "";
+
+document.getElementById("urlAdmin").value =
+storeData.settings?.urlAdmin || "";
+
+document.getElementById("urlChannel").value =
+storeData.settings?.urlChannel || "";
+
+document.getElementById("urlGroup").value =
+storeData.settings?.urlGroup || "";
+
+}
+
+
 // ================= BANNER =================
 
-function renderBannerPreview(){
+function renderBanner(){
 
 const preview =
 document.getElementById("bannerPreview");
@@ -521,7 +551,7 @@ return;
 if(banner.includes(".mp4")){
 
 preview.innerHTML = `
-<video controls autoplay muted loop>
+<video autoplay muted loop controls>
 <source src="${banner}" type="video/mp4">
 </video>
 `;
@@ -537,16 +567,16 @@ preview.innerHTML = `
 }
 
 
-// ================= ADD CATEGORY =================
+// ================= CATEGORY =================
 
 window.addCategory = async function(){
 
-const categoryName =
+const category =
 document.getElementById("categoryName")
 .value
 .trim();
 
-if(!categoryName){
+if(!category){
 
 alert("Isi kategori");
 
@@ -559,8 +589,8 @@ const id = Date.now();
 await set(
 ref(db,"store/categories/"+id),
 {
-id:id,
-name:categoryName
+id,
+name:category
 }
 );
 
@@ -668,7 +698,7 @@ alert("Produk berhasil");
 };
 
 
-// ================= RENDER PRODUCTS =================
+// ================= RENDER PRODUCT =================
 
 function renderProducts(){
 
