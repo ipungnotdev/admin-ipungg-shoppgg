@@ -3,9 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Store</title>
+
+<title>ADMIN STORE</title>
 
 <style>
+
 *{
 margin:0;
 padding:0;
@@ -63,6 +65,7 @@ background:linear-gradient(135deg,#9b30ff,#00e5ff);
 color:white;
 font-weight:bold;
 cursor:pointer;
+margin-top:10px;
 }
 
 button:hover{
@@ -137,142 +140,468 @@ border-radius:12px;
 margin-top:10px;
 border:1px solid #24113d;
 }
+
+#adminPanel{
+display:none;
+}
+
 </style>
 </head>
 <body>
 
 <div class="container">
 
-<h1>⚙️ ADMIN STORE PANEL</h1>
+<div id="loginBox" class="card">
+
+<h1>LOGIN ADMIN</h1>
+
+<input
+type="email"
+id="loginEmail"
+placeholder="Email Admin"
+>
+
+<input
+type="password"
+id="loginPassword"
+placeholder="Password Admin"
+>
+
+<button onclick="loginAdmin()">
+LOGIN
+</button>
+
+</div>
+
+<div id="adminPanel">
 
 <div class="card">
-<h2>SETTINGS STORE</h2>
+
+<h1>⚙️ ADMIN STORE</h1>
 
 <input type="text" id="storeName" placeholder="Nama Store">
 
 <input type="text" id="bannerUrl" placeholder="URL Banner IMG / MP4">
 
 <input type="text" id="urlAdmin" placeholder="URL Admin">
+
 <input type="text" id="urlChannel" placeholder="URL Channel">
+
 <input type="text" id="urlGroup" placeholder="URL Grup">
 
-<button onclick="saveSettings()">SIMPAN SETTINGS</button>
+<button onclick="saveSettings()">
+SIMPAN SETTINGS
+</button>
 
 <div class="preview-banner" id="bannerPreview"></div>
+
 </div>
 
+
 <div class="card">
-<h2>SETTINGS KATEGORI</h2>
 
-<input type="text" id="categoryName" placeholder="Nama Kategori">
+<h2>TAMBAH KATEGORI</h2>
 
-<button onclick="addCategory()">TAMBAH KATEGORI</button>
+<input
+type="text"
+id="categoryName"
+placeholder="Nama kategori"
+>
+
+<button onclick="addCategory()">
+TAMBAH KATEGORI
+</button>
 
 <div id="categoryList"></div>
+
 </div>
 
+
 <div class="card">
-<h2>SETTINGS PRODUK</h2>
 
-<input type="text" id="productName" placeholder="Nama Produk">
+<h2>TAMBAH PRODUK</h2>
 
-<input type="number" id="productPrice" placeholder="Harga Produk">
+<input
+type="text"
+id="productName"
+placeholder="Nama Produk"
+>
 
-<input type="text" id="productThumbnail" placeholder="URL Thumbnail">
+<input
+type="number"
+id="productPrice"
+placeholder="Harga Produk"
+>
+
+<input
+type="text"
+id="productThumbnail"
+placeholder="URL Thumbnail"
+>
 
 <select id="productCategory">
-<option value="">Pilih Kategori</option>
+<option value="">
+Pilih Kategori
+</option>
 </select>
 
 <div class="checkbox-wrap">
-<input type="checkbox" id="productPin">
-<label for="productPin">Pin Produk</label>
+
+<input
+type="checkbox"
+id="productPin"
+>
+
+<label for="productPin">
+Pin Produk
+</label>
+
 </div>
 
-<button onclick="addProduct()">TAMBAH PRODUK</button>
+<button onclick="addProduct()">
+TAMBAH PRODUK
+</button>
 
 <div id="productList"></div>
+
+</div>
+
+<button onclick="logoutAdmin()">
+LOGOUT
+</button>
+
 </div>
 
 </div>
 
-<script>
-const API_URL = "https://ipungg-storee-default-rtdb.firebaseio.com";
 
-let storeData = {
-settings:{},
-categories:[],
-products:[]
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+getDatabase,
+ref,
+set,
+onValue
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+import {
+getAuth,
+signInWithEmailAndPassword,
+onAuthStateChanged,
+signOut
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+
+// ================= FIREBASE CONFIG =================
+
+const firebaseConfig = {
+
+apiKey: "AIzaSyBlAhA8GNpjrQbzt97nnDi_HCea3h7QT5A",
+
+authDomain:
+"ipungg-storee.firebaseapp.com",
+
+databaseURL:
+"https://ipungg-storee-default-rtdb.firebaseio.com",
+
+projectId:
+"ipungg-storee",
+
+storageBucket:
+"ipungg-storee.firebasestorage.app",
+
+messagingSenderId:
+"577032533071",
+
+appId:
+"1:577032533071:web:b13eaa717210bd8044e63a"
+
 };
 
-async function loadData(){
+
+// ================= INIT =================
+
+const app =
+initializeApp(firebaseConfig);
+
+const db =
+getDatabase(app);
+
+const auth =
+getAuth(app);
+
+
+// ================= LOGIN =================
+
+window.loginAdmin = async function(){
+
+const email =
+document.getElementById("loginEmail").value;
+
+const password =
+document.getElementById("loginPassword").value;
+
+if(!email || !password){
+
+alert("Isi email dan password");
+
+return;
+
+}
 
 try{
 
-const res = await fetch(API_URL);
-const data = await res.json();
+await signInWithEmailAndPassword(
+auth,
+email,
+password
+);
 
-if(data){
-storeData = data;
-}
-
-renderAll();
+alert("Login berhasil");
 
 }catch(err){
-console.log(err);
-}
+
+alert(err.message);
 
 }
 
-function renderAll(){
+};
 
+
+// ================= LOGOUT =================
+
+window.logoutAdmin = async function(){
+
+await signOut(auth);
+
+};
+
+
+// ================= AUTH STATE =================
+
+onAuthStateChanged(auth,(user)=>{
+
+if(user){
+
+document.getElementById("loginBox")
+.style.display = "none";
+
+document.getElementById("adminPanel")
+.style.display = "block";
+
+loadStore();
+
+}else{
+
+document.getElementById("loginBox")
+.style.display = "block";
+
+document.getElementById("adminPanel")
+.style.display = "none";
+
+}
+
+});
+
+
+// ================= STORE DATA =================
+
+let storeData = {
+
+settings:{},
+
+categories:{},
+
+products:{}
+
+};
+
+
+// ================= LOAD STORE =================
+
+function loadStore(){
+
+onValue(ref(db,"store"),(snapshot)=>{
+
+const data = snapshot.val();
+
+if(data){
+
+storeData = data;
+
+}
+
+renderSettings();
 renderBannerPreview();
 renderCategories();
 renderProducts();
 
+});
+
 }
+
+
+// ================= RENDER SETTINGS =================
+
+function renderSettings(){
+
+document.getElementById("storeName").value =
+storeData.settings?.storeName || "";
+
+document.getElementById("bannerUrl").value =
+storeData.settings?.banner || "";
+
+document.getElementById("urlAdmin").value =
+storeData.settings?.urlAdmin || "";
+
+document.getElementById("urlChannel").value =
+storeData.settings?.urlChannel || "";
+
+document.getElementById("urlGroup").value =
+storeData.settings?.urlGroup || "";
+
+}
+
+
+// ================= SAVE SETTINGS =================
+
+window.saveSettings = async function(){
+
+const settings = {
+
+storeName:
+document.getElementById("storeName").value,
+
+banner:
+document.getElementById("bannerUrl").value,
+
+urlAdmin:
+document.getElementById("urlAdmin").value,
+
+urlChannel:
+document.getElementById("urlChannel").value,
+
+urlGroup:
+document.getElementById("urlGroup").value
+
+};
+
+await set(
+ref(db,"store/settings"),
+settings
+);
+
+alert("Settings berhasil disimpan");
+
+};
+
+
+// ================= BANNER =================
 
 function renderBannerPreview(){
 
-const preview = document.getElementById('bannerPreview');
-const banner = storeData.settings.banner || '';
+const preview =
+document.getElementById("bannerPreview");
+
+const banner =
+storeData.settings?.banner || "";
 
 if(!banner){
-preview.innerHTML = '';
+
+preview.innerHTML = "";
+
 return;
+
 }
 
-if(banner.includes('.mp4')){
+if(banner.includes(".mp4")){
+
 preview.innerHTML = `
 <video controls autoplay muted loop>
 <source src="${banner}" type="video/mp4">
 </video>
 `;
+
 }else{
+
 preview.innerHTML = `
 <img src="${banner}">
 `;
+
 }
 
 }
+
+
+// ================= ADD CATEGORY =================
+
+window.addCategory = async function(){
+
+const categoryName =
+document.getElementById("categoryName")
+.value
+.trim();
+
+if(!categoryName){
+
+alert("Isi kategori");
+
+return;
+
+}
+
+const id = Date.now();
+
+await set(
+ref(db,"store/categories/"+id),
+{
+id:id,
+name:categoryName
+}
+);
+
+document.getElementById("categoryName").value="";
+
+alert("Kategori berhasil");
+
+};
+
+
+// ================= RENDER CATEGORY =================
 
 function renderCategories(){
 
-const list = document.getElementById('categoryList');
-const select = document.getElementById('productCategory');
+const categoryList =
+document.getElementById("categoryList");
 
-list.innerHTML = '';
-select.innerHTML = '<option value="">Pilih Kategori</option>';
+const productCategory =
+document.getElementById("productCategory");
 
-storeData.categories.forEach(cat=>{
+categoryList.innerHTML = "";
 
-list.innerHTML += `
+productCategory.innerHTML = `
+<option value="">
+Pilih Kategori
+</option>
+`;
+
+const categories =
+Object.values(storeData.categories || {});
+
+categories.forEach(cat=>{
+
+categoryList.innerHTML += `
 <div class="category-item">
 ${cat.name}
 </div>
 `;
 
-select.innerHTML += `
+productCategory.innerHTML += `
 <option value="${cat.name}">
 ${cat.name}
 </option>
@@ -282,15 +611,79 @@ ${cat.name}
 
 }
 
+
+// ================= ADD PRODUCT =================
+
+window.addProduct = async function(){
+
+const name =
+document.getElementById("productName").value;
+
+const price =
+document.getElementById("productPrice").value;
+
+const thumbnail =
+document.getElementById("productThumbnail").value;
+
+const category =
+document.getElementById("productCategory").value;
+
+const pinned =
+document.getElementById("productPin").checked;
+
+if(
+!name ||
+!price ||
+!thumbnail ||
+!category
+){
+
+alert("Lengkapi data");
+
+return;
+
+}
+
+const id = Date.now();
+
+await set(
+ref(db,"store/products/"+id),
+{
+id,
+name,
+price,
+thumbnail,
+category,
+pinned
+}
+);
+
+document.getElementById("productName").value="";
+document.getElementById("productPrice").value="";
+document.getElementById("productThumbnail").value="";
+document.getElementById("productCategory").value="";
+document.getElementById("productPin").checked=false;
+
+alert("Produk berhasil");
+
+};
+
+
+// ================= RENDER PRODUCTS =================
+
 function renderProducts(){
 
-const wrap = document.getElementById('productList');
+const wrap =
+document.getElementById("productList");
 
-wrap.innerHTML = '';
+wrap.innerHTML = "";
 
-const sorted = [...storeData.products].sort((a,b)=>b.pinned-a.pinned);
+const products =
+Object.values(storeData.products || {});
 
-sorted.forEach(prod=>{
+products
+.sort((a,b)=>b.pinned-a.pinned)
+.forEach(prod=>{
 
 wrap.innerHTML += `
 <div class="product-card">
@@ -298,11 +691,20 @@ wrap.innerHTML += `
 <img src="${prod.thumbnail}">
 
 <div class="product-info">
+
 <h3>${prod.name}</h3>
-<p>Rp ${Number(prod.price).toLocaleString('id-ID')}</p>
+
+<p>
+Rp ${Number(prod.price)
+.toLocaleString("id-ID")}
+</p>
+
 <p>${prod.category}</p>
 
-${prod.pinned ? '<div class="pin-badge">PINNED</div>' : ''}
+${prod.pinned
+? '<div class="pin-badge">PINNED</div>'
+: ''
+}
 
 </div>
 
@@ -313,97 +715,6 @@ ${prod.pinned ? '<div class="pin-badge">PINNED</div>' : ''}
 
 }
 
-async function saveDatabase(){
-
-await fetch(API_URL,{
-method:'PUT',
-headers:{
-'Content-Type':'application/json'
-},
-body:JSON.stringify(storeData)
-});
-
-}
-
-async function saveSettings(){
-
-storeData.settings = {
-storeName:document.getElementById('storeName').value,
-banner:document.getElementById('bannerUrl').value,
-urlAdmin:document.getElementById('urlAdmin').value,
-urlChannel:document.getElementById('urlChannel').value,
-urlGroup:document.getElementById('urlGroup').value
-};
-
-await saveDatabase();
-
-renderBannerPreview();
-
-alert('Settings berhasil disimpan');
-
-}
-
-async function addCategory(){
-
-const name = document.getElementById('categoryName').value;
-
-if(!name){
-alert('Isi nama kategori');
-return;
-}
-
-storeData.categories.push({
-id:Date.now(),
-name
-});
-
-await saveDatabase();
-
-renderCategories();
-
-document.getElementById('categoryName').value='';
-
-}
-
-async function addProduct(){
-
-const name = document.getElementById('productName').value;
-const price = document.getElementById('productPrice').value;
-const thumbnail = document.getElementById('productThumbnail').value;
-const category = document.getElementById('productCategory').value;
-const pinned = document.getElementById('productPin').checked;
-
-if(!name || !price || !thumbnail || !category){
-alert('Lengkapi data produk');
-return;
-}
-
-storeData.products.push({
-id:Date.now(),
-name,
-price,
-thumbnail,
-category,
-pinned
-});
-
-await saveDatabase();
-
-renderProducts();
-
-// reset
-
-document.getElementById('productName').value='';
-document.getElementById('productPrice').value='';
-document.getElementById('productThumbnail').value='';
-document.getElementById('productCategory').value='';
-document.getElementById('productPin').checked=false;
-
-alert('Produk berhasil ditambah');
-
-}
-
-loadData();
 </script>
 
 </body>
