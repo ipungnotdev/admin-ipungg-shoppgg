@@ -3,979 +3,408 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashbord Admin Panel</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-<!-- ====== FIREBASE CONFIG — SAMAKAN DENGAN store.html ====== -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import {
-  getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc,
-  doc, setDoc, onSnapshot, serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import {
-  getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, updatePassword
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-// 🔧 GANTI DENGAN FIREBASE CONFIG KAMU (SAMA DENGAN store.html)
-const firebaseConfig = {
-  apiKey: "AIzaSyA9tSehgxD2Pgb7YPy7Pq-_bcuKLKswyos",
-  authDomain: "ipung-store-2b96d.firebaseapp.com",
-  projectId: "ipung-store-2b96d",
-  storageBucket: "ipung-store-2b96d.firebasestorage.app",
-    appId: "1:906202337063:web:1a39b7bad99a85b23c2302",
-  measurementId: "G-XJZ3S6FNE5"
-};
-
-// 🔧 IMGBB API KEY
-window.IMGBB_KEY = "a8a4d55f889fcadd95552214d55c46b3";
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
-
-window._db = db;
-window._auth = auth;
-window._fb = { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, setDoc, onSnapshot, serverTimestamp, signInWithEmailAndPassword, signOut, onAuthStateChanged, updatePassword };
-window.dispatchEvent(new Event('firebaseReady'));
-</script>
+<title>Admin Store</title>
 
 <style>
-:root {
-  --bg: #05020f; --bg2: #0a0520; --bg3: #0d0825;
-  --purple: #9b30ff; --neon: #bf5fff; --neon2: #00f5ff;
-  --pink: #ff2d78; --green: #00ff88; --yellow: #ffd600;
-  --card: #0f0828; --border: rgba(155,48,255,0.25);
-  --text: #f0e6ff; --sub: #7a6a9a; --danger: #ff3355;
-  --glow: 0 0 20px rgba(155,48,255,0.5);
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial;
 }
-* { box-sizing: border-box; margin:0; padding:0; }
-body { background:var(--bg); color:var(--text); font-family:'Rajdhani',sans-serif; min-height:100vh; display:flex; }
-body::before { content:''; position:fixed; inset:0; background:radial-gradient(ellipse at 10% 0%, rgba(155,48,255,0.1) 0%,transparent 50%),radial-gradient(ellipse at 90% 100%, rgba(0,245,255,0.05) 0%,transparent 50%); pointer-events:none; }
-::-webkit-scrollbar { width:4px; } ::-webkit-scrollbar-track { background:var(--bg); } ::-webkit-scrollbar-thumb { background:var(--purple); border-radius:2px; }
 
-/* ========= LOGIN ========= */
-#loginScreen { position:fixed; inset:0; z-index:1000; background:var(--bg); display:flex; align-items:center; justify-content:center; }
-.login-box { background:var(--bg2); border:1px solid var(--border); border-radius:20px; padding:40px; width:340px; box-shadow:0 0 60px rgba(155,48,255,0.3); animation:fadeUp 0.5s ease; }
-@keyframes fadeUp { from{transform:translateY(30px);opacity:0} to{transform:translateY(0);opacity:1} }
-.login-logo { text-align:center; margin-bottom:24px; }
-.login-logo .icon { font-size:48px; display:block; animation:logoPulse 2s infinite; }
-@keyframes logoPulse { 0%,100%{filter:drop-shadow(0 0 10px rgba(155,48,255,0.6))} 50%{filter:drop-shadow(0 0 25px rgba(155,48,255,1))} }
-.login-title { font-family:'Orbitron',monospace; font-size:14px; color:var(--neon); letter-spacing:0.1em; text-align:center; margin-bottom:4px; }
-.login-sub { font-size:12px; color:var(--sub); text-align:center; margin-bottom:28px; }
-
-/* ========= SIDEBAR ========= */
-.sidebar { width:220px; min-height:100vh; background:var(--bg2); border-right:1px solid var(--border); display:flex; flex-direction:column; position:fixed; left:0; top:0; bottom:0; z-index:50; transition:width 0.3s; }
-.sidebar-logo { padding:20px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px; }
-.sidebar-logo .icon { width:36px; height:36px; background:linear-gradient(135deg,var(--purple),var(--neon2)); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; box-shadow:var(--glow); }
-.sidebar-logo .name { font-family:'Orbitron',monospace; font-size:12px; font-weight:900; background:linear-gradient(90deg,var(--neon),var(--neon2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-.sidebar-nav { flex:1; padding:12px 8px; display:flex; flex-direction:column; gap:4px; overflow-y:auto; }
-.nav-item { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:10px; cursor:pointer; color:var(--sub); font-size:13px; font-weight:600; letter-spacing:0.03em; transition:all 0.2s; border:1px solid transparent; }
-.nav-item:hover { background:rgba(155,48,255,0.12); color:var(--text); border-color:rgba(155,48,255,0.2); }
-.nav-item.active { background:linear-gradient(135deg,rgba(155,48,255,0.25),rgba(0,245,255,0.1)); color:var(--neon); border-color:rgba(155,48,255,0.4); box-shadow:0 0 15px rgba(155,48,255,0.2); }
-.nav-item .ni { font-size:18px; width:22px; text-align:center; }
-.sidebar-footer { padding:12px 8px; border-top:1px solid var(--border); }
-.logout-btn { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:10px; cursor:pointer; color:var(--danger); font-size:13px; font-weight:600; width:100%; background:none; border:1px solid rgba(255,51,85,0.2); transition:all 0.2s; }
-.logout-btn:hover { background:rgba(255,51,85,0.1); box-shadow:0 0 15px rgba(255,51,85,0.2); }
-
-/* ========= MAIN ========= */
-.main { margin-left:220px; flex:1; padding:28px 24px; min-height:100vh; position:relative; z-index:1; }
-.page { display:none; animation:fadeUp 0.4s ease; }
-.page.active { display:block; }
-.page-title { font-family:'Orbitron',monospace; font-size:18px; font-weight:900; margin-bottom:6px; background:linear-gradient(90deg,var(--neon),var(--neon2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-.page-sub { font-size:13px; color:var(--sub); margin-bottom:24px; }
-
-/* STAT CARDS */
-.stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:16px; margin-bottom:28px; }
-.stat-card {
-  background:var(--card); border:1px solid var(--border); border-radius:16px;
-  padding:20px; position:relative; overflow:hidden;
-  animation:cardPulse 4s ease-in-out infinite;
-  transition:all 0.3s;
+body{
+background:#070312;
+color:white;
+padding:20px;
 }
-.stat-card:hover { transform:translateY(-4px); box-shadow:0 12px 40px rgba(155,48,255,0.3); border-color:var(--neon); }
-@keyframes cardPulse { 0%,100%{box-shadow:0 0 0 rgba(155,48,255,0)} 50%{box-shadow:0 0 20px rgba(155,48,255,0.2)} }
-.stat-card:nth-child(2) { animation-delay:0.5s; }
-.stat-card:nth-child(3) { animation-delay:1s; }
-.stat-card:nth-child(4) { animation-delay:1.5s; }
-.stat-card::before { content:''; position:absolute; top:-30px; right:-30px; width:80px; height:80px; background:radial-gradient(circle,var(--glow-color,rgba(155,48,255,0.2)) 0%,transparent 70%); border-radius:50%; }
-.stat-icon { font-size:28px; margin-bottom:10px; }
-.stat-val { font-family:'Orbitron',monospace; font-size:26px; font-weight:700; margin-bottom:4px; }
-.stat-label { font-size:11px; color:var(--sub); letter-spacing:0.08em; text-transform:uppercase; }
 
-/* SECTION CARD */
-.sec-card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:24px; margin-bottom:20px; }
-.sec-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
-.sec-title { font-family:'Orbitron',monospace; font-size:13px; color:var(--neon); letter-spacing:0.08em; }
-
-/* FORM */
-.form-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
-@media(max-width:600px) { .form-row { grid-template-columns:1fr; } }
-.form-group { margin-bottom:16px; }
-.form-label { display:block; font-size:11px; font-weight:700; color:var(--sub); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:6px; }
-.form-input, .form-select, .form-textarea {
-  width:100%; background:#0d0820; border:1px solid var(--border); color:var(--text);
-  border-radius:8px; padding:11px 14px; font-family:'Rajdhani',sans-serif; font-size:14px;
-  outline:none; transition:border 0.2s;
+.container{
+max-width:900px;
+margin:auto;
 }
-.form-input:focus, .form-select:focus, .form-textarea:focus { border-color:var(--purple); box-shadow:0 0 10px rgba(155,48,255,0.3); }
-.form-select option { background:var(--bg2); }
-.form-textarea { resize:vertical; min-height:80px; }
 
-/* BUTTONS */
-.btn { cursor:pointer; border:none; font-family:'Rajdhani',sans-serif; font-weight:700; letter-spacing:0.05em; border-radius:8px; padding:10px 20px; font-size:13px; transition:all 0.2s; display:inline-flex; align-items:center; gap:6px; }
-.btn:hover { transform:translateY(-1px); }
-.btn-purple { background:linear-gradient(135deg,var(--purple),#6b00cc); color:#fff; }
-.btn-purple:hover { box-shadow:0 0 20px rgba(155,48,255,0.6); }
-.btn-cyan { background:linear-gradient(135deg,#005f7a,var(--neon2)); color:#fff; }
-.btn-cyan:hover { box-shadow:0 0 20px rgba(0,245,255,0.4); }
-.btn-danger { background:linear-gradient(135deg,#7a0020,var(--danger)); color:#fff; }
-.btn-danger:hover { box-shadow:0 0 20px rgba(255,51,85,0.5); }
-.btn-ghost { background:rgba(155,48,255,0.1); color:var(--neon); border:1px solid rgba(155,48,255,0.3); }
-.btn-ghost:hover { background:rgba(155,48,255,0.2); }
-.btn-sm { padding:6px 14px; font-size:12px; border-radius:6px; }
-.btn-full { width:100%; justify-content:center; }
+.card{
+background:#120822;
+border:1px solid rgba(155,48,255,.25);
+padding:20px;
+border-radius:20px;
+margin-bottom:20px;
+}
 
-/* TABLE */
-.table-wrap { overflow-x:auto; }
-table { width:100%; border-collapse:collapse; font-size:13px; }
-th { padding:10px 14px; text-align:left; font-size:10px; letter-spacing:0.1em; color:var(--sub); text-transform:uppercase; border-bottom:1px solid var(--border); background:rgba(155,48,255,0.05); }
-td { padding:12px 14px; border-bottom:1px solid rgba(155,48,255,0.08); vertical-align:middle; }
-tr:hover td { background:rgba(155,48,255,0.05); }
-.badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:10px; font-weight:700; letter-spacing:0.05em; }
-.badge-pin { background:rgba(255,45,120,0.2); color:var(--pink); border:1px solid rgba(255,45,120,0.3); }
-.badge-cat { background:rgba(155,48,255,0.15); color:var(--neon); border:1px solid rgba(155,48,255,0.2); }
+h1{
+margin-bottom:20px;
+}
 
-/* UPLOAD AREA */
-.upload-drop { border:2px dashed var(--border); border-radius:10px; padding:24px; text-align:center; cursor:pointer; transition:all 0.2s; }
-.upload-drop:hover { border-color:var(--purple); background:rgba(155,48,255,0.05); }
-.upload-drop input { display:none; }
-.banner-preview { width:100%; max-height:160px; object-fit:cover; border-radius:8px; margin-top:12px; display:none; }
-.video-preview { width:100%; max-height:160px; border-radius:8px; margin-top:12px; display:none; }
-.upload-status { font-size:12px; color:var(--sub); margin-top:8px; }
-.progress-bar { height:4px; background:#1a0533; border-radius:2px; margin-top:8px; }
-.progress-fill { height:100%; background:linear-gradient(90deg,var(--purple),var(--neon2)); border-radius:2px; width:0; transition:width 0.3s; }
+h2{
+margin-bottom:15px;
+font-size:20px;
+}
 
-/* CAT CARD PREVIEW */
-.cat-preview-grid { display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
-.cat-preview-card { width:90px; height:80px; border-radius:12px; border:1px solid var(--border); background:var(--bg); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; position:relative; animation:cardPulse 3s ease-in-out infinite; }
-.cat-preview-card .del-cat { position:absolute; top:4px; right:4px; background:var(--danger); color:#fff; border:none; border-radius:50%; width:18px; height:18px; font-size:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+input,
+select{
+width:100%;
+padding:14px;
+margin-bottom:12px;
+border:none;
+border-radius:12px;
+background:#0b0515;
+color:white;
+outline:none;
+border:1px solid #2c1847;
+}
 
-/* PIN TOGGLE */
-.pin-toggle { cursor:pointer; font-size:18px; transition:transform 0.2s; }
-.pin-toggle:hover { transform:scale(1.3); }
+button{
+width:100%;
+padding:14px;
+border:none;
+border-radius:12px;
+background:linear-gradient(135deg,#9b30ff,#00e5ff);
+color:white;
+font-weight:bold;
+cursor:pointer;
+}
 
-/* TOAST */
-.toast { position:fixed; bottom:24px; right:24px; background:linear-gradient(135deg,var(--purple),var(--neon2)); color:#fff; padding:12px 22px; border-radius:12px; font-weight:700; font-size:13px; z-index:9999; transform:translateX(200%); transition:transform 0.3s; box-shadow:0 8px 32px rgba(155,48,255,0.5); max-width:280px; }
-.toast.show { transform:translateX(0); }
-.toast.error { background:linear-gradient(135deg,#7a0020,var(--danger)); }
+button:hover{
+opacity:.9;
+}
 
-/* MODAL */
-.modal-overlay { position:fixed; inset:0; background:rgba(5,2,15,0.9); backdrop-filter:blur(8px); z-index:800; display:flex; align-items:center; justify-content:center; padding:16px; opacity:0; pointer-events:none; transition:opacity 0.3s; }
-.modal-overlay.show { opacity:1; pointer-events:all; }
-.modal-box { background:var(--bg2); border:1px solid var(--border); border-radius:16px; padding:28px; width:100%; max-width:480px; max-height:90vh; overflow-y:auto; box-shadow:0 0 60px rgba(155,48,255,0.4); animation:fadeUp 0.3s ease; }
-.modal-title { font-family:'Orbitron',monospace; font-size:14px; color:var(--neon); margin-bottom:20px; }
-.modal-footer { display:flex; gap:10px; margin-top:20px; }
+.preview-banner{
+margin-top:15px;
+border-radius:16px;
+overflow:hidden;
+border:1px solid #2d1a4b;
+}
 
-/* EMOJI PICKER */
-.emoji-row { display:flex; gap:6px; flex-wrap:wrap; margin-top:6px; }
-.emoji-opt { font-size:22px; width:38px; height:38px; border-radius:8px; border:1px solid var(--border); background:var(--bg); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.2s; }
-.emoji-opt:hover, .emoji-opt.sel { border-color:var(--purple); background:rgba(155,48,255,0.15); box-shadow:0 0 10px rgba(155,48,255,0.3); }
+.preview-banner img,
+.preview-banner video{
+width:100%;
+display:block;
+max-height:280px;
+object-fit:cover;
+}
 
-/* RESPONSIVE */
-@media(max-width:768px) {
-  .sidebar { width:60px; }
-  .sidebar-logo .name, .nav-item span, .logout-btn span { display:none; }
-  .main { margin-left:60px; padding:16px 12px; }
+.product-card{
+background:#0b0515;
+border:1px solid #24113d;
+padding:15px;
+border-radius:16px;
+margin-top:12px;
+display:flex;
+gap:15px;
+align-items:center;
+}
+
+.product-card img{
+width:90px;
+height:90px;
+object-fit:cover;
+border-radius:12px;
+}
+
+.product-info{
+flex:1;
+}
+
+.pin-badge{
+display:inline-block;
+padding:5px 10px;
+background:#ffb300;
+color:black;
+font-size:12px;
+border-radius:50px;
+margin-top:6px;
+font-weight:bold;
+}
+
+.checkbox-wrap{
+display:flex;
+align-items:center;
+gap:10px;
+margin-bottom:15px;
+}
+
+.checkbox-wrap input{
+width:auto;
+margin:0;
+transform:scale(1.3);
+}
+
+.category-item{
+padding:12px;
+background:#0b0515;
+border-radius:12px;
+margin-top:10px;
+border:1px solid #24113d;
 }
 </style>
 </head>
 <body>
 
-<!-- LOGIN SCREEN -->
-<div id="loginScreen">
-  <div class="login-box">
-    <div class="login-logo">
-      <span class="icon">⚡</span>
-    </div>
-    <div class="login-title">ADMIN PANEL</div>
-    <div class="login-sub">NukuStore Dashboard</div>
-    <div class="form-group">
-      <label class="form-label">Email Admin</label>
-      <input class="form-input" id="loginEmail" type="email" placeholder="admin@email.com" value="">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Password</label>
-      <input class="form-input" id="loginPass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
-    </div>
-    <button class="btn btn-purple btn-full" style="margin-top:4px" onclick="doLogin()">⚡ LOGIN</button>
-    <div id="loginError" style="color:var(--danger);font-size:12px;text-align:center;margin-top:10px;display:none"></div>
-    <div style="margin-top:16px;padding:12px;background:rgba(155,48,255,0.08);border-radius:8px;border:1px solid var(--border)">
-      <div style="font-size:11px;color:var(--sub);line-height:1.8">
-        💡 Setup Firebase Auth dulu, buat user email/password di Firebase Console.<br>
-        Atau <b style="color:var(--neon)">gunakan demo mode</b> dengan klik tombol di bawah:
-      </div>
-      <button class="btn btn-ghost btn-full" style="margin-top:8px;font-size:12px" onclick="demoLogin()">🎮 Demo Mode (tanpa Firebase)</button>
-    </div>
-  </div>
+<div class="container">
+
+<h1>⚙️ ADMIN STORE PANEL</h1>
+
+<div class="card">
+<h2>SETTINGS STORE</h2>
+
+<input type="text" id="storeName" placeholder="Nama Store">
+
+<input type="text" id="bannerUrl" placeholder="URL Banner IMG / MP4">
+
+<input type="text" id="urlAdmin" placeholder="URL Admin">
+<input type="text" id="urlChannel" placeholder="URL Channel">
+<input type="text" id="urlGroup" placeholder="URL Grup">
+
+<button onclick="saveSettings()">SIMPAN SETTINGS</button>
+
+<div class="preview-banner" id="bannerPreview"></div>
 </div>
 
-<!-- SIDEBAR -->
-<aside class="sidebar">
-  <div class="sidebar-logo">
-    <div class="icon">⚡</div>
-    <div class="name">ADMIN</div>
-  </div>
-  <nav class="sidebar-nav">
-    <div class="nav-item active" onclick="showPage('dashboard')">
-      <span class="ni">📊</span><span>Dashboard</span>
-    </div>
-    <div class="nav-item" onclick="showPage('products')">
-      <span class="ni">📦</span><span>Produk</span>
-    </div>
-    <div class="nav-item" onclick="showPage('categories')">
-      <span class="ni">🏷️</span><span>Kategori</span>
-    </div>
-    <div class="nav-item" onclick="showPage('banner')">
-      <span class="ni">🖼️</span><span>Banner</span>
-    </div>
-    <div class="nav-item" onclick="showPage('settings')">
-      <span class="ni">⚙️</span><span>Settings</span>
-    </div>
-    <div class="nav-item" onclick="showPage('hapus')">
-      <span class="ni">🗑️</span><span>Hapus Data</span>
-    </div>
-  </nav>
-  <div class="sidebar-footer">
-    <button class="logout-btn" onclick="doLogout()">🚪 <span>Logout</span></button>
-  </div>
-</aside>
+<div class="card">
+<h2>SETTINGS KATEGORI</h2>
 
-<!-- MAIN CONTENT -->
-<main class="main">
+<input type="text" id="categoryName" placeholder="Nama Kategori">
 
-  <!-- ===== DASHBOARD ===== -->
-  <div class="page active" id="page-dashboard">
-    <div class="page-title">📊 DASHBOARD</div>
-    <div class="page-sub">Overview toko kamu</div>
-    <div class="stats-grid">
-      <div class="stat-card" style="--glow-color:rgba(155,48,255,0.3)">
-        <div class="stat-icon">📦</div>
-        <div class="stat-val" id="st-products">0</div>
-        <div class="stat-label">Total Produk</div>
-      </div>
-      <div class="stat-card" style="--glow-color:rgba(0,245,255,0.2)">
-        <div class="stat-icon">🏷️</div>
-        <div class="stat-val" id="st-cats">0</div>
-        <div class="stat-label">Kategori</div>
-      </div>
-      <div class="stat-card" style="--glow-color:rgba(255,45,120,0.2)">
-        <div class="stat-icon">📌</div>
-        <div class="stat-val" id="st-pinned">0</div>
-        <div class="stat-label">Produk Pinned</div>
-      </div>
-      <div class="stat-card" style="--glow-color:rgba(255,214,0,0.2)">
-        <div class="stat-icon">💰</div>
-        <div class="stat-val" id="st-minprice">-</div>
-        <div class="stat-label">Harga Terendah</div>
-      </div>
-    </div>
-    <div class="sec-card">
-      <div class="sec-header">
-        <div class="sec-title">📦 PRODUK TERBARU</div>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Produk</th><th>Kategori</th><th>Harga</th><th>Pin</th></tr></thead>
-          <tbody id="recentProducts"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
+<button onclick="addCategory()">TAMBAH KATEGORI</button>
 
-  <!-- ===== PRODUK ===== -->
-  <div class="page" id="page-products">
-    <div class="page-title">📦 MANAJEMEN PRODUK</div>
-    <div class="page-sub">Tambah, edit, dan kelola semua produk</div>
-    <div class="sec-card">
-      <div class="sec-header">
-        <div class="sec-title">➕ TAMBAH PRODUK</div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Nama Produk *</label>
-          <input class="form-input" id="prodName" placeholder="Nama produk...">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Harga (Rp) *</label>
-          <input class="form-input" id="prodPrice" type="number" placeholder="50000">
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">URL Thumbnail *</label>
-          <input class="form-input" id="prodThumb" placeholder="https://...">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Kategori</label>
-          <select class="form-select" id="prodCat">
-            <option value="">— Pilih Kategori —</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Deskripsi (opsional)</label>
-        <textarea class="form-textarea" id="prodDesc" placeholder="Deskripsi singkat produk..."></textarea>
-      </div>
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;font-weight:600">
-          <input type="checkbox" id="prodPinned" style="accent-color:var(--purple);width:16px;height:16px">
-          📌 Pin produk ini di kategori "Semua"
-        </label>
-      </div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <button class="btn btn-purple" onclick="saveProduct()">💾 Simpan Produk</button>
-        <button class="btn btn-ghost" onclick="clearProdForm()">✕ Batal</button>
-      </div>
-      <div id="prodFormMsg" style="margin-top:12px;font-size:13px"></div>
-    </div>
-
-    <div class="sec-card">
-      <div class="sec-header">
-        <div class="sec-title">📋 DAFTAR PRODUK</div>
-        <input class="form-input" id="searchProd" placeholder="🔍 Cari..." style="width:180px;padding:8px 12px;font-size:13px" oninput="renderProductTable()">
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Thumb</th><th>Nama</th><th>Kategori</th><th>Harga</th><th>Pin</th><th>Aksi</th></tr></thead>
-          <tbody id="prodTable"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== KATEGORI ===== -->
-  <div class="page" id="page-categories">
-    <div class="page-title">🏷️ KATEGORI</div>
-    <div class="page-sub">Tambah dan kelola kategori produk</div>
-    <div class="sec-card">
-      <div class="sec-header"><div class="sec-title">➕ TAMBAH KATEGORI</div></div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Nama Kategori *</label>
-          <input class="form-input" id="catName" placeholder="Contoh: Script, Template, Bot...">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Emoji Ikon</label>
-          <input class="form-input" id="catEmoji" placeholder="📦" maxlength="4" style="font-size:22px;text-align:center">
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Pilih Emoji Cepat</label>
-        <div class="emoji-row" id="emojiPicker"></div>
-      </div>
-      <button class="btn btn-purple" onclick="saveCategory()">💾 Simpan Kategori</button>
-    </div>
-
-    <div class="sec-card">
-      <div class="sec-header"><div class="sec-title">📋 KATEGORI TERSEDIA</div></div>
-      <div class="cat-preview-grid" id="catPreviewGrid"></div>
-    </div>
-  </div>
-
-  <!-- ===== BANNER ===== -->
-  <div class="page" id="page-banner">
-    <div class="page-title">🖼️ BANNER</div>
-    <div class="page-sub">Upload banner gambar atau video MP4</div>
-    <div class="sec-card">
-      <div class="sec-header"><div class="sec-title">📤 UPLOAD BANNER</div></div>
-      <div class="form-group">
-        <label class="form-label">Tipe Banner</label>
-        <select class="form-select" id="bannerType" onchange="onBannerTypeChange()">
-          <option value="image">🖼️ Gambar (JPG/PNG/GIF)</option>
-          <option value="video">🎬 Video (MP4)</option>
-          <option value="url">🔗 URL Langsung</option>
-        </select>
-      </div>
-      <div id="bannerUploadArea">
-        <div class="upload-drop" id="bannerDrop" onclick="document.getElementById('bannerFile').click()">
-          <div style="font-size:36px;margin-bottom:8px">🖼️</div>
-          <div style="font-size:14px;color:var(--sub)">Klik atau drag file di sini</div>
-          <div style="font-size:11px;color:var(--sub);margin-top:4px">Max 5MB • JPG, PNG, GIF, MP4</div>
-          <input type="file" id="bannerFile" accept="image/*,video/mp4" onchange="handleBannerUpload(event)">
-          <div class="progress-bar" id="bannerProgress" style="margin-top:12px"><div class="progress-fill" id="bannerProgressFill"></div></div>
-          <div class="upload-status" id="bannerStatus"></div>
-        </div>
-        <img id="bannerImgPreview" class="banner-preview" alt="Banner preview">
-        <video id="bannerVidPreview" class="video-preview" controls muted loop></video>
-      </div>
-      <div id="bannerUrlArea" style="display:none">
-        <div class="form-group">
-          <label class="form-label">URL Banner (gambar atau video)</label>
-          <input class="form-input" id="bannerUrlInput" placeholder="https://...">
-        </div>
-      </div>
-      <div id="bannerCurrentUrl" style="margin-top:12px;font-size:12px;color:var(--sub)"></div>
-      <button class="btn btn-purple" style="margin-top:16px" onclick="saveBannerUrl()">💾 Simpan Banner</button>
-    </div>
-  </div>
-
-  <!-- ===== SETTINGS ===== -->
-  <div class="page" id="page-settings">
-    <div class="page-title">⚙️ SETTINGS</div>
-    <div class="page-sub">Konfigurasi toko & akun admin</div>
-    <div class="sec-card">
-      <div class="sec-header"><div class="sec-title">🏪 INFO TOKO</div></div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Nama Toko</label>
-          <input class="form-input" id="sStoreName" placeholder="NUKU STORE">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Credit / Footer</label>
-          <input class="form-input" id="sCredit" placeholder="Made with ❤️ by NukuStore">
-        </div>
-      </div>
-      <div class="sec-title" style="margin-bottom:12px;margin-top:4px">💬 LINK WHATSAPP</div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">No. WA Admin (tanpa +)</label>
-          <input class="form-input" id="sWaAdmin" placeholder="6281234567890">
-        </div>
-        <div class="form-group">
-          <label class="form-label">URL Channel Admin</label>
-          <input class="form-input" id="sWaChannel" placeholder="https://whatsapp.com/channel/...">
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">URL Grup Community</label>
-          <input class="form-input" id="sWaGroup" placeholder="https://chat.whatsapp.com/...">
-        </div>
-        <div class="form-group">
-          <label class="form-label">URL Community</label>
-          <input class="form-input" id="sWaCommunity" placeholder="https://chat.whatsapp.com/...">
-        </div>
-      </div>
-      <div class="sec-title" style="margin-bottom:12px;margin-top:4px">💳 PEMBAYARAN</div>
-      <div class="form-group">
-        <label class="form-label">URL Gambar QRIS</label>
-        <input class="form-input" id="sQris" placeholder="https://... (URL gambar QRIS kamu)">
-      </div>
-      <button class="btn btn-purple" onclick="saveSettings()">💾 Simpan Settings</button>
-    </div>
-
-    <div class="sec-card">
-      <div class="sec-header"><div class="sec-title">🔐 UBAH PASSWORD ADMIN</div></div>
-      <div class="form-group">
-        <label class="form-label">Password Baru</label>
-        <input class="form-input" id="newPass" type="password" placeholder="Min 6 karakter">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Konfirmasi Password</label>
-        <input class="form-input" id="confPass" type="password" placeholder="Ulangi password">
-      </div>
-      <button class="btn btn-cyan" onclick="changePassword()">🔒 Ubah Password</button>
-      <div id="passMsg" style="margin-top:10px;font-size:13px"></div>
-    </div>
-  </div>
-
-  <!-- ===== HAPUS DATA ===== -->
-  <div class="page" id="page-hapus">
-    <div class="page-title">🗑️ HAPUS DATA</div>
-    <div class="page-sub">Hapus produk atau kategori secara permanen</div>
-    <div class="sec-card">
-      <div class="sec-header"><div class="sec-title">📦 HAPUS PRODUK</div></div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Nama Produk</th><th>Kategori</th><th>Harga</th><th>Aksi</th></tr></thead>
-          <tbody id="deleteProductTable"></tbody>
-        </table>
-      </div>
-    </div>
-    <div class="sec-card">
-      <div class="sec-header"><div class="sec-title">🏷️ HAPUS KATEGORI</div></div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Nama Kategori</th><th>Emoji</th><th>Aksi</th></tr></thead>
-          <tbody id="deleteCatTable"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-</main>
-
-<!-- DELETE CONFIRM MODAL -->
-<div class="modal-overlay" id="deleteModal">
-  <div class="modal-box">
-    <div class="modal-title">⚠️ KONFIRMASI HAPUS</div>
-    <div id="deleteModalText" style="color:var(--sub);font-size:14px;margin-bottom:4px"></div>
-    <p style="font-size:12px;color:var(--danger);margin-top:8px">⚠️ Tindakan ini tidak dapat dibatalkan!</p>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal()">Batal</button>
-      <button class="btn btn-danger" id="deleteConfirmBtn">🗑️ Ya, Hapus</button>
-    </div>
-  </div>
+<div id="categoryList"></div>
 </div>
 
-<!-- EDIT PRODUCT MODAL -->
-<div class="modal-overlay" id="editModal">
-  <div class="modal-box">
-    <div class="modal-title">✏️ EDIT PRODUK</div>
-    <div class="form-group">
-      <label class="form-label">Nama Produk</label>
-      <input class="form-input" id="editName">
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">Harga (Rp)</label>
-        <input class="form-input" id="editPrice" type="number">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Kategori</label>
-        <select class="form-select" id="editCat"></select>
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">URL Thumbnail</label>
-      <input class="form-input" id="editThumb">
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal()">Batal</button>
-      <button class="btn btn-purple" onclick="confirmEditProduct()">💾 Simpan</button>
-    </div>
-  </div>
+<div class="card">
+<h2>SETTINGS PRODUK</h2>
+
+<input type="text" id="productName" placeholder="Nama Produk">
+
+<input type="number" id="productPrice" placeholder="Harga Produk">
+
+<input type="text" id="productThumbnail" placeholder="URL Thumbnail">
+
+<select id="productCategory">
+<option value="">Pilih Kategori</option>
+</select>
+
+<div class="checkbox-wrap">
+<input type="checkbox" id="productPin">
+<label for="productPin">Pin Produk</label>
 </div>
 
-<div class="toast" id="toast"></div>
+<button onclick="addProduct()">TAMBAH PRODUK</button>
+
+<div id="productList"></div>
+</div>
+
+</div>
 
 <script>
-// ============ STATE ============
-let products = [], categories = [], settings = {};
-let currentUser = null, editingProductId = null;
-let demoMode = false;
+const API_URL = "https://ipungg-storee-default-rtdb.firebaseio.com";
 
-// ============ LOGIN ============
-function doLogin() {
-  const email = document.getElementById('loginEmail').value.trim();
-  const pass = document.getElementById('loginPass').value;
-  const errEl = document.getElementById('loginError');
-  if (!email || !pass) { errEl.textContent = '⚠️ Isi email dan password!'; errEl.style.display='block'; return; }
-  errEl.style.display = 'none';
-  const { signInWithEmailAndPassword } = window._fb;
-  signInWithEmailAndPassword(window._auth, email, pass)
-    .then(u => { currentUser = u.user; enterDashboard(); })
-    .catch(e => { errEl.textContent = '❌ ' + (e.code === 'auth/invalid-credential' ? 'Email/password salah' : e.message); errEl.style.display='block'; });
+let storeData = {
+settings:{},
+categories:[],
+products:[]
+};
+
+async function loadData(){
+
+try{
+
+const res = await fetch(API_URL);
+const data = await res.json();
+
+if(data){
+storeData = data;
 }
 
-function demoLogin() {
-  demoMode = true;
-  currentUser = { email: 'demo@admin.com', uid: 'demo' };
-  enterDashboard();
-  loadDemoData();
+renderAll();
+
+}catch(err){
+console.log(err);
 }
 
-function doLogout() {
-  if (!demoMode && window._auth) window._fb.signOut(window._auth);
-  currentUser = null; demoMode = false;
-  document.getElementById('loginScreen').style.display = 'flex';
 }
 
-function enterDashboard() {
-  document.getElementById('loginScreen').style.display = 'none';
-  if (!demoMode) loadFromFirebase();
+function renderAll(){
+
+renderBannerPreview();
+renderCategories();
+renderProducts();
+
 }
 
-// ============ FIREBASE LOAD ============
-function loadFromFirebase() {
-  const { collection, onSnapshot } = window._fb;
-  const db = window._db;
-  onSnapshot(collection(db, 'settings'), snap => {
-    snap.forEach(d => { settings = { id: d.id, ...d.data() }; });
-    applySettingsToForm();
-  });
-  onSnapshot(collection(db, 'categories'), snap => {
-    categories = [];
-    snap.forEach(d => categories.push({ id: d.id, ...d.data() }));
-    renderAll();
-  });
-  onSnapshot(collection(db, 'products'), snap => {
-    products = [];
-    snap.forEach(d => products.push({ id: d.id, ...d.data() }));
-    renderAll();
-  });
+function renderBannerPreview(){
+
+const preview = document.getElementById('bannerPreview');
+const banner = storeData.settings.banner || '';
+
+if(!banner){
+preview.innerHTML = '';
+return;
 }
 
-function loadDemoData() {
-  categories = [
-    { id:'cat1', name:'Script', emoji:'📜', color:'#9b30ff' },
-    { id:'cat2', name:'Template', emoji:'🖥️', color:'#00f5ff' },
-    { id:'cat3', name:'Tools', emoji:'🔧', color:'#ff2d78' },
-  ];
-  products = [
-    { id:'p1', name:'Script Auto Reply WA', price:50000, thumbnail:'', category:'Script', pinned:true },
-    { id:'p2', name:'Template Toko Online', price:75000, thumbnail:'', category:'Template', pinned:false },
-    { id:'p3', name:'Tools Scraper IG', price:120000, thumbnail:'', category:'Tools', pinned:false },
-  ];
-  settings = { storeName:'NUKU STORE', waAdmin:'6281234567890', credit:'Made with ❤️' };
-  renderAll();
-  applySettingsToForm();
+if(banner.includes('.mp4')){
+preview.innerHTML = `
+<video controls autoplay muted loop>
+<source src="${banner}" type="video/mp4">
+</video>
+`;
+}else{
+preview.innerHTML = `
+<img src="${banner}">
+`;
 }
 
-function renderAll() {
-  renderStats(); renderProductTable(); renderCategoryPage();
-  renderDeleteTables(); renderRecentProducts(); populateCatSelect();
 }
 
-// ============ STATS ============
-function renderStats() {
-  document.getElementById('st-products').textContent = products.length;
-  document.getElementById('st-cats').textContent = categories.length;
-  document.getElementById('st-pinned').textContent = products.filter(p=>p.pinned).length;
-  const prices = products.map(p=>Number(p.price)).filter(p=>p>0);
-  document.getElementById('st-minprice').textContent = prices.length ? 'Rp'+Math.min(...prices).toLocaleString('id-ID') : '-';
-}
+function renderCategories(){
 
-function renderRecentProducts() {
-  const tbody = document.getElementById('recentProducts');
-  const recent = [...products].slice(-5).reverse();
-  tbody.innerHTML = recent.map(p=>`
-    <tr>
-      <td><b>${p.name}</b></td>
-      <td><span class="badge badge-cat">${p.category||'-'}</span></td>
-      <td style="font-family:'Orbitron',monospace;color:var(--neon);font-size:12px">Rp${Number(p.price).toLocaleString('id-ID')}</td>
-      <td>${p.pinned?'<span class="badge badge-pin">📌 PIN</span>':'-'}</td>
-    </tr>
-  `).join('') || '<tr><td colspan="4" style="color:var(--sub);text-align:center;padding:20px">Belum ada produk</td></tr>';
-}
+const list = document.getElementById('categoryList');
+const select = document.getElementById('productCategory');
 
-// ============ PRODUCT TABLE ============
-function renderProductTable() {
-  const q = (document.getElementById('searchProd')?.value||'').toLowerCase();
-  const filtered = products.filter(p=>p.name.toLowerCase().includes(q)||((p.category||'').toLowerCase().includes(q)));
-  const tbody = document.getElementById('prodTable');
-  tbody.innerHTML = filtered.map(p=>`
-    <tr>
-      <td>${p.thumbnail?`<img src="${p.thumbnail}" style="width:40px;height:40px;object-fit:cover;border-radius:6px;border:1px solid var(--border)">`:'<div style="width:40px;height:40px;background:var(--bg);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:18px">📦</div>'}</td>
-      <td><b>${p.name}</b></td>
-      <td><span class="badge badge-cat">${p.category||'-'}</span></td>
-      <td style="font-family:'Orbitron',monospace;color:var(--neon);font-size:12px">Rp${Number(p.price).toLocaleString('id-ID')}</td>
-      <td><span class="pin-toggle" title="Toggle pin" onclick="togglePin('${p.id}','${!p.pinned}')">${p.pinned?'📌':'📍'}</span></td>
-      <td style="display:flex;gap:6px">
-        <button class="btn btn-ghost btn-sm" onclick="openEditModal('${p.id}')">✏️</button>
-        <button class="btn btn-danger btn-sm" onclick="confirmDelete('product','${p.id}','${p.name.replace(/'/g,"\\'")}')">🗑️</button>
-      </td>
-    </tr>
-  `).join('') || '<tr><td colspan="6" style="color:var(--sub);text-align:center;padding:20px">Belum ada produk</td></tr>';
-}
+list.innerHTML = '';
+select.innerHTML = '<option value="">Pilih Kategori</option>';
 
-// ============ CATEGORIES ============
-const EMOJIS = ['📦','📜','🖥️','🔧','🤖','🎮','🎨','💻','🛒','⚡','🔥','💎','🎯','🚀','🎁','📱','🖼️','🎵','🌐','⭐'];
+storeData.categories.forEach(cat=>{
 
-function renderCategoryPage() {
-  const picker = document.getElementById('emojiPicker');
-  if (picker) picker.innerHTML = EMOJIS.map(e=>`<div class="emoji-opt" onclick="pickEmoji('${e}')">${e}</div>`).join('');
-  const grid = document.getElementById('catPreviewGrid');
-  if (!grid) return;
-  if (!categories.length) { grid.innerHTML='<div style="color:var(--sub);font-size:13px">Belum ada kategori</div>'; return; }
-  grid.innerHTML = categories.map(c=>`
-    <div class="cat-preview-card">
-      <button class="del-cat" onclick="confirmDelete('category','${c.id}','${c.name}')">✕</button>
-      <div style="font-size:26px">${c.emoji||'📦'}</div>
-      <div style="font-size:11px;font-weight:700;text-align:center;color:var(--text)">${c.name}</div>
-    </div>
-  `).join('');
-}
+list.innerHTML += `
+<div class="category-item">
+${cat.name}
+</div>
+`;
 
-function pickEmoji(e) {
-  document.getElementById('catEmoji').value = e;
-  document.querySelectorAll('.emoji-opt').forEach(el=>el.classList.remove('sel'));
-  event.currentTarget.classList.add('sel');
-}
+select.innerHTML += `
+<option value="${cat.name}">
+${cat.name}
+</option>
+`;
 
-async function saveCategory() {
-  const name = document.getElementById('catName').value.trim();
-  const emoji = document.getElementById('catEmoji').value.trim() || '📦';
-  if (!name) { showToast('⚠️ Nama kategori wajib diisi!', 'error'); return; }
-  if (categories.find(c=>c.name.toLowerCase()===name.toLowerCase())) { showToast('⚠️ Kategori sudah ada!', 'error'); return; }
-  const newCat = { id: 'cat_'+Date.now(), name, emoji };
-  if (!demoMode) {
-    try {
-      const { collection, addDoc } = window._fb;
-      await addDoc(collection(window._db, 'categories'), { name, emoji, createdAt: window._fb.serverTimestamp() });
-    } catch(e) { showToast('❌ Gagal simpan: '+e.message,'error'); return; }
-  } else {
-    categories.push(newCat);
-  }
-  document.getElementById('catName').value = '';
-  document.getElementById('catEmoji').value = '';
-  showToast('✅ Kategori berhasil ditambahkan!');
-  renderAll();
-}
-
-function populateCatSelect() {
-  ['prodCat','editCat'].forEach(id=>{
-    const el = document.getElementById(id); if (!el) return;
-    const cur = el.value;
-    el.innerHTML = '<option value="">— Pilih Kategori —</option>' +
-      categories.map(c=>`<option value="${c.name}" ${cur===c.name?'selected':''}>${c.emoji||''} ${c.name}</option>`).join('');
-  });
-}
-
-// ============ SAVE PRODUCT ============
-async function saveProduct() {
-  const name = document.getElementById('prodName').value.trim();
-  const price = Number(document.getElementById('prodPrice').value);
-  const thumbnail = document.getElementById('prodThumb').value.trim();
-  const category = document.getElementById('prodCat').value;
-  const desc = document.getElementById('prodDesc').value.trim();
-  const pinned = document.getElementById('prodPinned').checked;
-  const msg = document.getElementById('prodFormMsg');
-  if (!name || !price) { msg.innerHTML='<span style="color:var(--danger)">⚠️ Nama & harga wajib diisi!</span>'; return; }
-  const data = { name, price, thumbnail, category, desc, pinned, createdAt: new Date().toISOString() };
-  if (!demoMode) {
-    try {
-      const { collection, addDoc, serverTimestamp } = window._fb;
-      await addDoc(collection(window._db, 'products'), { ...data, createdAt: serverTimestamp() });
-    } catch(e) { msg.innerHTML=`<span style="color:var(--danger)">❌ ${e.message}</span>`; return; }
-  } else {
-    products.unshift({ id:'p_'+Date.now(), ...data });
-  }
-  msg.innerHTML='<span style="color:var(--green)">✅ Produk berhasil ditambahkan!</span>';
-  clearProdForm();
-  showToast('✅ Produk ditambahkan!');
-  renderAll();
-  setTimeout(()=>msg.innerHTML='', 3000);
-}
-
-function clearProdForm() {
-  ['prodName','prodPrice','prodThumb','prodDesc'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('prodPinned').checked = false;
-  document.getElementById('prodCat').value = '';
-}
-
-async function togglePin(id, val) {
-  const pinned = val === 'true';
-  if (!demoMode) {
-    try { await window._fb.updateDoc(window._fb.doc(window._db,'products',id), { pinned }); }
-    catch(e) { showToast('❌ '+e.message,'error'); return; }
-  } else {
-    const p = products.find(x=>x.id===id); if(p) p.pinned = pinned;
-  }
-  showToast(pinned?'📌 Produk di-pin!':'📍 Pin dilepas');
-  renderAll();
-}
-
-// ============ EDIT PRODUCT ============
-function openEditModal(id) {
-  const p = products.find(x=>x.id===id); if(!p) return;
-  editingProductId = id;
-  document.getElementById('editName').value = p.name;
-  document.getElementById('editPrice').value = p.price;
-  document.getElementById('editThumb').value = p.thumbnail||'';
-  populateCatSelect();
-  document.getElementById('editCat').value = p.category||'';
-  document.getElementById('editModal').classList.add('show');
-}
-
-async function confirmEditProduct() {
-  const name = document.getElementById('editName').value.trim();
-  const price = Number(document.getElementById('editPrice').value);
-  const thumbnail = document.getElementById('editThumb').value.trim();
-  const category = document.getElementById('editCat').value;
-  if (!name||!price) { showToast('⚠️ Isi semua field!','error'); return; }
-  if (!demoMode) {
-    try { await window._fb.updateDoc(window._fb.doc(window._db,'products',editingProductId),{name,price,thumbnail,category}); }
-    catch(e) { showToast('❌ '+e.message,'error'); return; }
-  } else {
-    const p = products.find(x=>x.id===editingProductId);
-    if(p) Object.assign(p,{name,price,thumbnail,category});
-  }
-  closeModal(); showToast('✅ Produk diperbarui!'); renderAll();
-}
-
-// ============ DELETE ============
-let pendingDelete = null;
-function confirmDelete(type, id, name) {
-  pendingDelete = { type, id };
-  document.getElementById('deleteModalText').textContent = `Hapus ${type==='product'?'produk':'kategori'} "${name}"?`;
-  document.getElementById('deleteConfirmBtn').onclick = executDelete;
-  document.getElementById('deleteModal').classList.add('show');
-}
-
-async function executDelete() {
-  const { type, id } = pendingDelete;
-  if (!demoMode) {
-    try { await window._fb.deleteDoc(window._fb.doc(window._db, type==='product'?'products':'categories', id)); }
-    catch(e) { showToast('❌ '+e.message,'error'); closeModal(); return; }
-  } else {
-    if (type==='product') products = products.filter(p=>p.id!==id);
-    else categories = categories.filter(c=>c.id!==id);
-  }
-  closeModal(); showToast('🗑️ Berhasil dihapus!'); renderAll();
-}
-
-function renderDeleteTables() {
-  const pt = document.getElementById('deleteProductTable');
-  if(pt) pt.innerHTML = products.map(p=>`
-    <tr>
-      <td><b>${p.name}</b></td>
-      <td><span class="badge badge-cat">${p.category||'-'}</span></td>
-      <td style="font-family:'Orbitron',monospace;color:var(--neon);font-size:12px">Rp${Number(p.price).toLocaleString('id-ID')}</td>
-      <td><button class="btn btn-danger btn-sm" onclick="confirmDelete('product','${p.id}','${p.name.replace(/'/g,"\\'")}')">🗑️ Hapus</button></td>
-    </tr>
-  `).join('') || '<tr><td colspan="4" style="color:var(--sub);text-align:center;padding:16px">Kosong</td></tr>';
-
-  const ct = document.getElementById('deleteCatTable');
-  if(ct) ct.innerHTML = categories.map(c=>`
-    <tr>
-      <td><b>${c.name}</b></td>
-      <td style="font-size:22px">${c.emoji||'📦'}</td>
-      <td><button class="btn btn-danger btn-sm" onclick="confirmDelete('category','${c.id}','${c.name}')">🗑️ Hapus</button></td>
-    </tr>
-  `).join('') || '<tr><td colspan="3" style="color:var(--sub);text-align:center;padding:16px">Kosong</td></tr>';
-}
-
-// ============ BANNER ============
-function onBannerTypeChange() {
-  const type = document.getElementById('bannerType').value;
-  document.getElementById('bannerUploadArea').style.display = type==='url'?'none':'block';
-  document.getElementById('bannerUrlArea').style.display = type==='url'?'block':'none';
-}
-
-async function handleBannerUpload(event) {
-  const file = event.target.files[0]; if (!file) return;
-  const type = document.getElementById('bannerType').value;
-  const imgPrev = document.getElementById('bannerImgPreview');
-  const vidPrev = document.getElementById('bannerVidPreview');
-  const status = document.getElementById('bannerStatus');
-  const fill = document.getElementById('bannerProgressFill');
-
-  if (type==='video'||file.type.startsWith('video')) {
-    vidPrev.src = URL.createObjectURL(file); vidPrev.style.display='block'; imgPrev.style.display='none';
-  } else {
-    imgPrev.src = URL.createObjectURL(file); imgPrev.style.display='block'; vidPrev.style.display='none';
-  }
-
-  status.textContent = '⏳ Mengupload ke ImgBB...';
-  fill.style.width = '30%';
-  const formData = new FormData();
-  formData.append('image', file);
-  try {
-    const res = await fetch(`https://api.imgbb.com/1/upload?key=${window.IMGBB_KEY}`, { method:'POST', body:formData });
-    const data = await res.json();
-    if (data.success) {
-      fill.style.width = '100%';
-      status.textContent = '✅ Upload berhasil! URL: ' + data.data.url;
-      window._bannerUploadUrl = data.data.url;
-      window._bannerUploadType = type;
-      document.getElementById('bannerCurrentUrl').textContent = 'URL: ' + data.data.url;
-    } else throw new Error('Gagal');
-  } catch(e) {
-    status.textContent = '❌ Upload gagal. Masukkan URL manual atau cek API key ImgBB.';
-    fill.style.width = '0';
-  }
-}
-
-async function saveBannerUrl() {
-  const type = document.getElementById('bannerType').value;
-  let url = '';
-  if (type==='url') { url = document.getElementById('bannerUrlInput').value.trim(); }
-  else { url = window._bannerUploadUrl || ''; }
-  if (!url) { showToast('⚠️ Upload file atau masukkan URL dulu!','error'); return; }
-  if (!demoMode) {
-    try {
-      const { collection, getDocs, doc, setDoc, addDoc } = window._fb;
-      const snap = await getDocs(collection(window._db,'settings'));
-      if (!snap.empty) {
-        const docRef = snap.docs[0].ref;
-        await window._fb.updateDoc(docRef, { banner:url, bannerType:type });
-      } else {
-        await addDoc(collection(window._db,'settings'), { banner:url, bannerType:type });
-      }
-    } catch(e) { showToast('❌ '+e.message,'error'); return; }
-  } else { settings.banner=url; settings.bannerType=type; }
-  showToast('✅ Banner disimpan!');
-}
-
-// ============ SETTINGS ============
-function applySettingsToForm() {
-  if (!settings) return;
-  const s = settings;
-  const set = (id,v) => { const el=document.getElementById(id); if(el&&v) el.value=v; };
-  set('sStoreName', s.storeName); set('sCredit', s.credit);
-  set('sWaAdmin', s.waAdmin); set('sWaChannel', s.waChannel);
-  set('sWaGroup', s.waGroup); set('sWaCommunity', s.waCommunity);
-  set('sQris', s.qrisImage);
-}
-
-async function saveSettings() {
-  const data = {
-    storeName: document.getElementById('sStoreName').value.trim(),
-    credit: document.getElementById('sCredit').value.trim(),
-    waAdmin: document.getElementById('sWaAdmin').value.trim(),
-    waChannel: document.getElementById('sWaChannel').value.trim(),
-    waGroup: document.getElementById('sWaGroup').value.trim(),
-    waCommunity: document.getElementById('sWaCommunity').value.trim(),
-    qrisImage: document.getElementById('sQris').value.trim(),
-  };
-  if (!demoMode) {
-    try {
-      const { collection, getDocs, addDoc, updateDoc } = window._fb;
-      const snap = await getDocs(collection(window._db,'settings'));
-      if (!snap.empty) { await updateDoc(snap.docs[0].ref, data); }
-      else { await addDoc(collection(window._db,'settings'), data); }
-    } catch(e) { showToast('❌ '+e.message,'error'); return; }
-  } else { Object.assign(settings, data); }
-  showToast('✅ Settings disimpan!');
-}
-
-async function changePassword() {
-  const np = document.getElementById('newPass').value;
-  const cp = document.getElementById('confPass').value;
-  const msg = document.getElementById('passMsg');
-  if (!np||!cp) { msg.innerHTML='<span style="color:var(--danger)">⚠️ Isi semua field!</span>'; return; }
-  if (np!==cp) { msg.innerHTML='<span style="color:var(--danger)">❌ Password tidak sama!</span>'; return; }
-  if (np.length<6) { msg.innerHTML='<span style="color:var(--danger)">❌ Min 6 karakter!</span>'; return; }
-  if (demoMode) { msg.innerHTML='<span style="color:var(--yellow)">⚠️ Demo mode — gunakan Firebase untuk ubah password asli</span>'; return; }
-  try {
-    await window._fb.updatePassword(currentUser, np);
-    msg.innerHTML='<span style="color:var(--green)">✅ Password berhasil diubah!</span>';
-    document.getElementById('newPass').value=''; document.getElementById('confPass').value='';
-  } catch(e) {
-    msg.innerHTML=`<span style="color:var(--danger)">❌ ${e.message}</span>`;
-  }
-}
-
-// ============ UTILS ============
-function showPage(name) {
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  document.getElementById('page-'+name).classList.add('active');
-  event.currentTarget.classList.add('active');
-}
-
-function closeModal() {
-  document.querySelectorAll('.modal-overlay').forEach(m=>m.classList.remove('show'));
-  editingProductId = null; pendingDelete = null;
-}
-
-function showToast(msg, type='success') {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.className = 'toast' + (type==='error'?' error':'');
-  t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'), 3000);
-}
-
-// ============ FIREBASE READY ============
-if (window._firebaseReady) {}
-window.addEventListener('firebaseReady', () => {
-  const { onAuthStateChanged } = window._fb;
-  onAuthStateChanged(window._auth, user => {
-    if (user) { currentUser=user; enterDashboard(); }
-  });
 });
+
+}
+
+function renderProducts(){
+
+const wrap = document.getElementById('productList');
+
+wrap.innerHTML = '';
+
+const sorted = [...storeData.products].sort((a,b)=>b.pinned-a.pinned);
+
+sorted.forEach(prod=>{
+
+wrap.innerHTML += `
+<div class="product-card">
+
+<img src="${prod.thumbnail}">
+
+<div class="product-info">
+<h3>${prod.name}</h3>
+<p>Rp ${Number(prod.price).toLocaleString('id-ID')}</p>
+<p>${prod.category}</p>
+
+${prod.pinned ? '<div class="pin-badge">PINNED</div>' : ''}
+
+</div>
+
+</div>
+`;
+
+});
+
+}
+
+async function saveDatabase(){
+
+await fetch(API_URL,{
+method:'PUT',
+headers:{
+'Content-Type':'application/json'
+},
+body:JSON.stringify(storeData)
+});
+
+}
+
+async function saveSettings(){
+
+storeData.settings = {
+storeName:document.getElementById('storeName').value,
+banner:document.getElementById('bannerUrl').value,
+urlAdmin:document.getElementById('urlAdmin').value,
+urlChannel:document.getElementById('urlChannel').value,
+urlGroup:document.getElementById('urlGroup').value
+};
+
+await saveDatabase();
+
+renderBannerPreview();
+
+alert('Settings berhasil disimpan');
+
+}
+
+async function addCategory(){
+
+const name = document.getElementById('categoryName').value;
+
+if(!name){
+alert('Isi nama kategori');
+return;
+}
+
+storeData.categories.push({
+id:Date.now(),
+name
+});
+
+await saveDatabase();
+
+renderCategories();
+
+document.getElementById('categoryName').value='';
+
+}
+
+async function addProduct(){
+
+const name = document.getElementById('productName').value;
+const price = document.getElementById('productPrice').value;
+const thumbnail = document.getElementById('productThumbnail').value;
+const category = document.getElementById('productCategory').value;
+const pinned = document.getElementById('productPin').checked;
+
+if(!name || !price || !thumbnail || !category){
+alert('Lengkapi data produk');
+return;
+}
+
+storeData.products.push({
+id:Date.now(),
+name,
+price,
+thumbnail,
+category,
+pinned
+});
+
+await saveDatabase();
+
+renderProducts();
+
+// reset
+
+document.getElementById('productName').value='';
+document.getElementById('productPrice').value='';
+document.getElementById('productThumbnail').value='';
+document.getElementById('productCategory').value='';
+document.getElementById('productPin').checked=false;
+
+alert('Produk berhasil ditambah');
+
+}
+
+loadData();
 </script>
+
 </body>
-</html>
+  </html>
