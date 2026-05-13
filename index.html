@@ -12,7 +12,7 @@ body { background:#070312; color:white; padding:20px; min-height:100vh; }
 h1 { margin-bottom:20px; font-size:22px; background:linear-gradient(90deg,#bf5fff,#00f5ff); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
 h2 { margin-bottom:16px; font-size:17px; color:#bf5fff; }
 label { display:block; font-size:12px; color:#8b7aaa; margin-bottom:4px; margin-top:12px; letter-spacing:0.05em; text-transform:uppercase; }
-input, select, textarea {
+input, select {
   width:100%; padding:12px 14px; border:1px solid #2d1a4b; border-radius:10px;
   background:#0b0515; color:white; outline:none; font-size:14px; transition:border 0.2s;
 }
@@ -22,49 +22,34 @@ button.btn {
   font-weight:700; font-size:13px; transition:all 0.2s; margin-top:8px;
 }
 .btn-primary { background:linear-gradient(135deg,#9b30ff,#00e5ff); color:white; width:100%; }
-.btn-primary:hover { opacity:0.9; box-shadow:0 0 20px rgba(155,48,255,0.5); }
-.btn-danger { background:#3d0a1a; border:1px solid #8b1a3a; color:#ff6b9d; padding:6px 12px; font-size:12px; margin:0; }
-.btn-danger:hover { background:#5c1028; }
-.btn-edit { background:#1a2a3d; border:1px solid #1a4a6b; color:#00f5ff; padding:6px 12px; font-size:12px; margin:0; }
-.btn-edit:hover { background:#1a3a5c; }
-.btn-logout { background:#1a0515; border:1px solid #4b1a2d; color:#ff6b9d; width:100%; margin-top:0; }
-.btn-logout:hover { background:#2a0825; }
+.btn-primary:hover { opacity:0.9; }
+.btn-danger { background:#3d0a1a; border:1px solid #8b1a3a; color:#ff6b9d; padding:6px 12px; font-size:12px; margin:0; border-radius:8px; cursor:pointer; }
+.btn-edit { background:#1a2a3d; border:1px solid #1a4a6b; color:#00f5ff; padding:6px 12px; font-size:12px; margin:0; border-radius:8px; cursor:pointer; }
+.btn-logout { background:#1a0515; border:1px solid #4b1a2d; color:#ff6b9d; width:100%; }
 
-/* PRODUCT LIST */
-.product-card {
-  display:flex; gap:14px; align-items:center; padding:14px;
-  border-radius:14px; background:#0b0515; border:1px solid #24113d; margin-top:12px;
-  transition:border 0.2s;
-}
-.product-card:hover { border-color:#4b1a7b; }
+.product-card { display:flex; gap:14px; align-items:center; padding:14px; border-radius:14px; background:#0b0515; border:1px solid #24113d; margin-top:12px; }
 .product-card img { width:80px; height:80px; object-fit:cover; border-radius:10px; border:1px solid #2d1a4b; flex-shrink:0; }
-.product-card .no-img { width:80px; height:80px; background:#1a0533; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:32px; flex-shrink:0; }
+.no-img { width:80px; height:80px; background:#1a0533; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:32px; flex-shrink:0; }
 .product-info { flex:1; min-width:0; }
-.product-info h3 { font-size:15px; margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.product-info h3 { font-size:15px; margin-bottom:4px; }
 .product-info p { font-size:13px; color:#8b7aaa; margin-bottom:4px; }
-.product-info .price { color:#bf5fff; font-weight:700; font-family:monospace; }
+.price { color:#bf5fff !important; font-weight:700; font-family:monospace; }
 .pin-badge { display:inline-block; padding:3px 10px; border-radius:20px; background:#ffb300; color:black; font-size:11px; font-weight:bold; }
 .card-actions { display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
-
-/* CATEGORY */
 .category-item { padding:10px 14px; border-radius:10px; background:#0b0515; border:1px solid #24113d; margin-top:8px; display:flex; align-items:center; justify-content:space-between; gap:10px; }
-.category-item span { font-size:14px; font-weight:600; }
-
-/* BANNER PREVIEW */
 .preview-banner { margin-top:14px; overflow:hidden; border-radius:14px; border:1px solid #2d1a4b; }
 .preview-banner img, .preview-banner video { width:100%; max-height:250px; object-fit:cover; display:block; }
-
-/* TOAST */
-.toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(60px); background:linear-gradient(135deg,#9b30ff,#00f5ff); color:#fff; padding:12px 24px; border-radius:30px; font-weight:700; font-size:13px; z-index:999; transition:transform 0.3s; white-space:nowrap; pointer-events:none; }
+.toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(100px); background:linear-gradient(135deg,#9b30ff,#00f5ff); color:#fff; padding:12px 24px; border-radius:30px; font-weight:700; font-size:14px; z-index:999; transition:transform 0.3s; pointer-events:none; max-width:90vw; text-align:center; }
 .toast.show { transform:translateX(-50%) translateY(0); }
-
-/* STATUS */
-.status-bar { padding:10px 14px; border-radius:10px; margin-bottom:16px; font-size:13px; font-weight:600; display:none; }
-.status-bar.ok { background:rgba(0,255,100,0.1); border:1px solid rgba(0,255,100,0.3); color:#00ff64; display:block; }
-.status-bar.err { background:rgba(255,50,80,0.1); border:1px solid rgba(255,50,80,0.3); color:#ff6b9d; display:block; }
-
+.status { padding:12px 16px; border-radius:10px; margin-bottom:12px; font-size:14px; font-weight:600; display:none; }
+.status.ok { background:rgba(0,255,100,0.1); border:1px solid rgba(0,255,100,0.3); color:#00ff64; display:block; }
+.status.err { background:rgba(255,50,80,0.1); border:1px solid rgba(255,50,80,0.3); color:#ff6b9d; display:block; }
+.status.info { background:rgba(0,200,255,0.1); border:1px solid rgba(0,200,255,0.3); color:#00e5ff; display:block; }
+.db-bar { padding:10px 16px; border-radius:10px; margin-bottom:16px; font-size:13px; font-weight:700; text-align:center; }
+.db-bar.wait { background:rgba(255,180,0,0.1); border:1px solid rgba(255,180,0,0.3); color:#ffb300; }
+.db-bar.ok { background:rgba(0,255,100,0.1); border:1px solid rgba(0,255,100,0.3); color:#00ff64; }
+.db-bar.err { background:rgba(255,50,80,0.1); border:1px solid rgba(255,50,80,0.3); color:#ff6b9d; }
 #adminPanel { display:none; }
-.loading { color:#8b7aaa; font-size:13px; padding:20px 0; text-align:center; }
 </style>
 </head>
 <body>
@@ -73,82 +58,75 @@ button.btn {
   <!-- LOGIN -->
   <div class="card" id="loginBox">
     <h1>🔐 LOGIN ADMIN</h1>
-    <div id="loginStatus" class="status-bar"></div>
+    <div class="status" id="loginStatus"></div>
     <label>Email</label>
     <input type="email" id="loginEmail" placeholder="admin@email.com">
     <label>Password</label>
-    <input type="password" id="loginPassword" placeholder="Password..." onkeydown="if(event.key==='Enter')loginAdmin()">
+    <input type="password" id="loginPassword" placeholder="Password...">
     <button class="btn btn-primary" onclick="loginAdmin()">LOGIN</button>
   </div>
 
   <!-- ADMIN PANEL -->
   <div id="adminPanel">
 
+    <div class="db-bar wait" id="dbBar">⏳ Menghubungkan ke database...</div>
+
     <!-- SETTINGS -->
     <div class="card">
       <h1>⚙️ IPUNGG SHOP — ADMIN</h1>
-      <div id="settingsStatus" class="status-bar"></div>
-
+      <div class="status" id="settingsStatus"></div>
       <label>Nama Store</label>
       <input type="text" id="storeName" placeholder="IPUNGG SHOP">
-
-      <label>URL Banner (gambar atau .mp4)</label>
+      <label>URL Banner (link gambar JPG/PNG atau video MP4)</label>
       <input type="text" id="bannerUrl" placeholder="https://...">
-
-      <label>Nomor WA Admin (contoh: 6281234567890)</label>
+      <label>Nomor WA Admin (contoh: 6285198959920)</label>
       <input type="text" id="urlAdmin" placeholder="6285198959920">
-
       <label>URL Channel WhatsApp</label>
       <input type="text" id="urlChannel" placeholder="https://whatsapp.com/channel/...">
-
       <label>URL Grup WhatsApp</label>
       <input type="text" id="urlGroup" placeholder="https://chat.whatsapp.com/...">
-
       <button class="btn btn-primary" onclick="saveSettings()">💾 SIMPAN SETTINGS</button>
       <div class="preview-banner" id="bannerPreview"></div>
     </div>
 
     <!-- KATEGORI -->
     <div class="card">
-      <h2>📂 TAMBAH KATEGORI</h2>
-      <div id="catStatus" class="status-bar"></div>
-      <label>Nama Kategori</label>
-      <input type="text" id="categoryName" placeholder="Contoh: Voucher, Diamond, Item..." onkeydown="if(event.key==='Enter')addCategory()">
+      <h2>📂 KELOLA KATEGORI</h2>
+      <div class="status" id="catStatus"></div>
+      <label>Nama Kategori Baru</label>
+      <input type="text" id="categoryName" placeholder="Contoh: Diamond, Voucher, Item...">
       <button class="btn btn-primary" onclick="addCategory()">✦ TAMBAH KATEGORI</button>
-      <div id="categoryList" style="margin-top:16px"><div class="loading">Memuat kategori...</div></div>
+      <div id="categoryList" style="margin-top:16px">
+        <div style="color:#8b7aaa;font-size:13px">Menunggu koneksi...</div>
+      </div>
     </div>
 
     <!-- PRODUK -->
     <div class="card">
-      <h2>📦 TAMBAH PRODUK</h2>
-      <div id="prodStatus" class="status-bar"></div>
-
+      <h2>📦 KELOLA PRODUK</h2>
+      <div class="status" id="prodStatus"></div>
       <label>Nama Produk</label>
       <input type="text" id="productName" placeholder="Nama produk...">
-
       <label>Harga (Rp)</label>
       <input type="number" id="productPrice" placeholder="50000">
-
-      <label>URL Thumbnail</label>
-      <input type="text" id="productThumbnail" placeholder="https://...">
-
+      <label>URL Thumbnail (link gambar)</label>
+      <input type="text" id="productThumbnail" placeholder="https://...jpg (boleh kosong)">
       <label>Kategori</label>
       <select id="productCategory">
-        <option value="">Pilih Kategori</option>
+        <option value="">-- Pilih Kategori --</option>
       </select>
-
-      <div style="display:flex;align-items:center;gap:10px;margin-top:14px">
+      <div style="display:flex;align-items:center;gap:10px;margin-top:14px;margin-bottom:4px">
         <input type="checkbox" id="productPin" style="width:auto;transform:scale(1.3)">
-        <label for="productPin" style="margin:0;text-transform:none;font-size:14px;color:white">📌 Pin Produk (tampil di atas)</label>
+        <label for="productPin" style="margin:0;text-transform:none;font-size:14px;color:white;cursor:pointer">📌 Pin Produk (tampil paling atas)</label>
       </div>
-
       <button class="btn btn-primary" onclick="addProduct()">✦ TAMBAH PRODUK</button>
-
-      <div id="productList" style="margin-top:16px"><div class="loading">Memuat produk...</div></div>
+      <div id="productList" style="margin-top:16px">
+        <div style="color:#8b7aaa;font-size:13px">Menunggu koneksi...</div>
+      </div>
     </div>
 
     <div class="card" style="padding:16px">
-      <button class="btn btn-logout" onclick="logoutAdmin()">🚪 LOGOUT</button>
+      <button class="btn btn-logout btn" onclick="logoutAdmin()">🚪 LOGOUT</button>
     </div>
 
   </div>
@@ -174,27 +152,28 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const auth = getAuth(app);
-
 let storeData = { settings:{}, categories:{}, products:{} };
 
-// ===== AUTH =====
+// ===== LOGIN =====
 window.loginAdmin = async function() {
   const email = document.getElementById("loginEmail").value.trim();
   const pass = document.getElementById("loginPassword").value;
-  const status = document.getElementById("loginStatus");
-  if (!email || !pass) { showStatus(status, "err", "Isi email dan password!"); return; }
+  const s = document.getElementById("loginStatus");
+  if (!email || !pass) { showS(s,"err","⚠️ Isi email dan password!"); return; }
+  showS(s,"info","⏳ Logging in...");
   try {
     await signInWithEmailAndPassword(auth, email, pass);
   } catch(err) {
-    const msg = err.code === 'auth/invalid-credential' ? "Email atau password salah!"
-               : err.code === 'auth/too-many-requests' ? "Terlalu banyak percobaan. Tunggu sebentar."
-               : err.message;
-    showStatus(status, "err", msg);
+    let msg = "❌ " + err.message;
+    if (err.code==='auth/invalid-credential'||err.code==='auth/wrong-password') msg="❌ Email atau password salah!";
+    else if (err.code==='auth/user-not-found') msg="❌ Akun tidak ditemukan!";
+    else if (err.code==='auth/too-many-requests') msg="❌ Terlalu banyak percobaan, tunggu dulu.";
+    showS(s,"err",msg);
   }
 };
 
 window.logoutAdmin = async function() {
-  await signOut(auth);
+  if (confirm("Yakin mau logout?")) await signOut(auth);
 };
 
 onAuthStateChanged(auth, (user) => {
@@ -208,188 +187,204 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-// ===== LOAD =====
+// ===== LOAD STORE =====
 function loadStore() {
-  onValue(ref(db, "store"), (snapshot) => {
-    storeData = snapshot.val() || { settings:{}, categories:{}, products:{} };
+  const dbBar = document.getElementById("dbBar");
+  onValue(ref(db, "store"), (snap) => {
+    dbBar.className = "db-bar ok";
+    dbBar.textContent = "✅ Database terhubung & real-time aktif!";
+    setTimeout(() => dbBar.style.display = "none", 3000);
+
+    const raw = snap.val() || {};
+    storeData.settings = raw.settings || {};
+    storeData.categories = raw.categories || {};
+    storeData.products = raw.products || {};
+
     renderSettings();
     renderBanner();
     renderCategories();
     renderProducts();
+  }, (err) => {
+    dbBar.className = "db-bar err";
+    dbBar.textContent = "❌ Database gagal: " + err.message;
+    showToast("❌ " + err.message);
   });
 }
 
 // ===== SETTINGS =====
 function renderSettings() {
-  const s = storeData.settings || {};
-  document.getElementById("storeName").value = s.storeName || "";
-  document.getElementById("bannerUrl").value = s.banner || "";
-  document.getElementById("urlAdmin").value = s.urlAdmin || "";
-  document.getElementById("urlChannel").value = s.urlChannel || "";
-  document.getElementById("urlGroup").value = s.urlGroup || "";
+  const s = storeData.settings;
+  setVal("storeName", s.storeName||"");
+  setVal("bannerUrl", s.banner||"");
+  setVal("urlAdmin", s.urlAdmin||"");
+  setVal("urlChannel", s.urlChannel||"");
+  setVal("urlGroup", s.urlGroup||"");
 }
 
 function renderBanner() {
-  const preview = document.getElementById("bannerPreview");
-  const banner = storeData.settings?.banner || "";
-  if (!banner) { preview.innerHTML = ""; return; }
-  if (banner.includes(".mp4")) {
-    preview.innerHTML = `<video autoplay muted loop controls><source src="${banner}" type="video/mp4"></video>`;
+  const p = document.getElementById("bannerPreview");
+  const b = storeData.settings?.banner||"";
+  if (!b) { p.innerHTML=""; return; }
+  if (b.match(/\.mp4$/i)) {
+    p.innerHTML=`<video autoplay muted loop controls><source src="${b}" type="video/mp4"></video>`;
   } else {
-    preview.innerHTML = `<img src="${banner}" alt="Banner">`;
+    p.innerHTML=`<img src="${b}" onerror="this.parentElement.innerHTML='<p style=color:#ff6b9d;padding:10px>❌ URL gambar tidak valid</p>'">`;
   }
 }
 
 window.saveSettings = async function() {
-  const status = document.getElementById("settingsStatus");
-  const settings = {
-    storeName: document.getElementById("storeName").value.trim(),
-    banner: document.getElementById("bannerUrl").value.trim(),
-    urlAdmin: document.getElementById("urlAdmin").value.trim(),
-    urlChannel: document.getElementById("urlChannel").value.trim(),
-    urlGroup: document.getElementById("urlGroup").value.trim(),
+  const s = document.getElementById("settingsStatus");
+  showS(s,"info","⏳ Menyimpan...");
+  const data = {
+    storeName: getVal("storeName"),
+    banner: getVal("bannerUrl"),
+    urlAdmin: getVal("urlAdmin"),
+    urlChannel: getVal("urlChannel"),
+    urlGroup: getVal("urlGroup"),
   };
   try {
-    await set(ref(db, "store/settings"), settings);
-    showStatus(status, "ok", "✅ Settings berhasil disimpan!");
+    await set(ref(db,"store/settings"), data);
+    showS(s,"ok","✅ Settings berhasil disimpan!");
     showToast("✅ Settings disimpan!");
+    renderBanner();
   } catch(e) {
-    showStatus(status, "err", "❌ Gagal: " + e.message);
+    showS(s,"err","❌ Gagal: "+e.message+" → Cek Firebase Rules!");
+    showToast("❌ Gagal simpan!");
   }
 };
 
-// ===== CATEGORY =====
+// ===== KATEGORI =====
 window.addCategory = async function() {
-  const status = document.getElementById("catStatus");
-  const name = document.getElementById("categoryName").value.trim();
-  if (!name) { showStatus(status, "err", "Isi nama kategori!"); return; }
-  const id = Date.now();
+  const s = document.getElementById("catStatus");
+  const name = getVal("categoryName").trim();
+  if (!name) { showS(s,"err","⚠️ Isi nama kategori!"); return; }
+  showS(s,"info","⏳ Menyimpan...");
+  const id = String(Date.now());
   try {
-    await set(ref(db, "store/categories/" + id), { id, name });
-    document.getElementById("categoryName").value = "";
-    showStatus(status, "ok", "✅ Kategori berhasil ditambahkan!");
+    await set(ref(db,"store/categories/"+id), {id, name});
+    setVal("categoryName","");
+    showS(s,"ok",`✅ Kategori "${name}" ditambahkan!`);
     showToast("✅ Kategori ditambahkan!");
   } catch(e) {
-    showStatus(status, "err", "❌ Gagal: " + e.message);
+    showS(s,"err","❌ Gagal: "+e.message+" → Pastikan Firebase Rules = true!");
+    showToast("❌ Gagal tambah kategori!");
   }
 };
 
 window.deleteCategory = async function(id) {
   if (!confirm("Hapus kategori ini?")) return;
-  await remove(ref(db, "store/categories/" + id));
-  showToast("🗑️ Kategori dihapus!");
+  try {
+    await remove(ref(db,"store/categories/"+id));
+    showToast("🗑️ Kategori dihapus!");
+  } catch(e) { showToast("❌ Gagal hapus: "+e.message); }
 };
 
 function renderCategories() {
   const wrap = document.getElementById("categoryList");
-  const select = document.getElementById("productCategory");
-  const cats = Object.values(storeData.categories || {});
+  const sel = document.getElementById("productCategory");
+  const cats = Object.values(storeData.categories||{});
 
-  select.innerHTML = `<option value="">Pilih Kategori</option>`;
-  cats.forEach(cat => {
-    select.innerHTML += `<option value="${cat.name}">${cat.name}</option>`;
-  });
+  const cur = sel.value;
+  sel.innerHTML = `<option value="">-- Pilih Kategori --</option>`;
+  cats.forEach(c => sel.innerHTML += `<option value="${c.name}">${c.name}</option>`);
+  sel.value = cur;
 
-  if (cats.length === 0) {
-    wrap.innerHTML = `<div style="color:#8b7aaa;font-size:13px;padding:10px 0">Belum ada kategori</div>`;
-    return;
-  }
-  wrap.innerHTML = cats.map(cat => `
-    <div class="category-item">
-      <span>📂 ${cat.name}</span>
-      <button class="btn btn-danger" onclick="deleteCategory('${cat.id}')">🗑️ Hapus</button>
-    </div>
-  `).join('');
+  wrap.innerHTML = cats.length === 0
+    ? `<div style="color:#8b7aaa;font-size:13px;padding:10px 0">Belum ada kategori.</div>`
+    : cats.map(c => `
+      <div class="category-item">
+        <span>📂 ${c.name}</span>
+        <button class="btn-danger" onclick="deleteCategory('${c.id}')">🗑️ Hapus</button>
+      </div>`).join('');
 }
 
-// ===== PRODUCT =====
+// ===== PRODUK =====
 window.addProduct = async function() {
-  const status = document.getElementById("prodStatus");
-  const name = document.getElementById("productName").value.trim();
-  const price = document.getElementById("productPrice").value.trim();
-  const thumbnail = document.getElementById("productThumbnail").value.trim();
-  const category = document.getElementById("productCategory").value;
+  const s = document.getElementById("prodStatus");
+  const name = getVal("productName").trim();
+  const price = getVal("productPrice").trim();
+  const thumbnail = getVal("productThumbnail").trim();
+  const category = getVal("productCategory");
   const pinned = document.getElementById("productPin").checked;
 
-  if (!name || !price || !category) {
-    showStatus(status, "err", "⚠️ Nama, harga, dan kategori wajib diisi!"); return;
-  }
+  if (!name)     { showS(s,"err","⚠️ Nama produk wajib diisi!"); return; }
+  if (!price)    { showS(s,"err","⚠️ Harga wajib diisi!"); return; }
+  if (!category) { showS(s,"err","⚠️ Pilih kategori dulu! (Tambah kategori jika belum ada)"); return; }
 
-  const id = Date.now();
-  const product = { id, name, price: Number(price), thumbnail, category, pinned, createdAt: id };
+  showS(s,"info","⏳ Menyimpan produk...");
+  const id = String(Date.now());
+  const prod = { id, name, price: Number(price), thumbnail, category, pinned, createdAt: Number(id) };
 
   try {
-    await set(ref(db, "store/products/" + id), product);
-    document.getElementById("productName").value = "";
-    document.getElementById("productPrice").value = "";
-    document.getElementById("productThumbnail").value = "";
-    document.getElementById("productCategory").value = "";
+    await set(ref(db,"store/products/"+id), prod);
+    setVal("productName",""); setVal("productPrice","");
+    setVal("productThumbnail",""); setVal("productCategory","");
     document.getElementById("productPin").checked = false;
-    showStatus(status, "ok", "✅ Produk berhasil ditambahkan!");
+    showS(s,"ok",`✅ Produk "${name}" berhasil ditambahkan!`);
     showToast("✅ Produk ditambahkan!");
   } catch(e) {
-    showStatus(status, "err", "❌ Gagal: " + e.message);
+    showS(s,"err","❌ Gagal: "+e.message+" → Cek Firebase Rules!");
+    showToast("❌ Gagal tambah produk!");
   }
 };
 
 window.deleteProduct = async function(id) {
   if (!confirm("Hapus produk ini?")) return;
-  await remove(ref(db, "store/products/" + id));
-  showToast("🗑️ Produk dihapus!");
+  try {
+    await remove(ref(db,"store/products/"+id));
+    showToast("🗑️ Produk dihapus!");
+  } catch(e) { showToast("❌ Gagal hapus: "+e.message); }
 };
 
-window.togglePin = async function(id, current) {
-  await update(ref(db, "store/products/" + id), { pinned: !current });
-  showToast(current ? "📌 Unpin" : "📌 Produk di-pin!");
+window.togglePin = async function(id, cur) {
+  try {
+    await update(ref(db,"store/products/"+id), {pinned: !cur});
+    showToast(cur ? "📌 Produk di-unpin" : "📌 Produk di-pin!");
+  } catch(e) { showToast("❌ Gagal: "+e.message); }
 };
 
 function renderProducts() {
   const wrap = document.getElementById("productList");
-  const prods = Object.values(storeData.products || {});
+  const prods = Object.values(storeData.products||{});
 
   if (prods.length === 0) {
-    wrap.innerHTML = `<div style="color:#8b7aaa;font-size:13px;padding:10px 0">Belum ada produk</div>`;
+    wrap.innerHTML = `<div style="color:#8b7aaa;font-size:13px;padding:10px 0">Belum ada produk. Tambahkan di atas.</div>`;
     return;
   }
 
-  prods.sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0) || b.id - a.id);
+  prods.sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0)||Number(b.id)-Number(a.id));
 
   wrap.innerHTML = prods.map(p => `
     <div class="product-card">
       ${p.thumbnail
-        ? `<img src="${p.thumbnail}" alt="${p.name}" onerror="this.style.display='none'">`
-        : `<div class="no-img">📦</div>`
-      }
+        ? `<img src="${p.thumbnail}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+        : ''}
+      <div class="no-img" ${p.thumbnail?'style="display:none"':''}>📦</div>
       <div class="product-info">
         <h3>${p.name}</h3>
         <p class="price">Rp ${Number(p.price).toLocaleString('id-ID')}</p>
         <p>${p.category}</p>
-        ${p.pinned ? '<span class="pin-badge">📌 PINNED</span>' : ''}
+        ${p.pinned?'<span class="pin-badge">📌 PINNED</span>':''}
         <div class="card-actions">
-          <button class="btn btn-edit" onclick="togglePin('${p.id}', ${!!p.pinned})">
-            ${p.pinned ? '📌 Unpin' : '📌 Pin'}
-          </button>
-          <button class="btn btn-danger" onclick="deleteProduct('${p.id}')">🗑️ Hapus</button>
+          <button class="btn-edit" onclick="togglePin('${p.id}',${!!p.pinned})">${p.pinned?'📌 Unpin':'📌 Pin'}</button>
+          <button class="btn-danger" onclick="deleteProduct('${p.id}')">🗑️ Hapus</button>
         </div>
       </div>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
-// ===== HELPERS =====
-function showStatus(el, type, msg) {
-  el.className = "status-bar " + type;
-  el.textContent = msg;
-  setTimeout(() => { el.className = "status-bar"; }, 4000);
+// ===== UTILS =====
+function getVal(id) { return document.getElementById(id)?.value||""; }
+function setVal(id,v) { const el=document.getElementById(id); if(el) el.value=v; }
+function showS(el,type,msg) {
+  el.className="status "+type; el.textContent=msg;
+  if(type==="ok") setTimeout(()=>el.className="status",4000);
 }
-
 window.showToast = function(msg) {
-  const t = document.getElementById("toast");
-  t.textContent = msg;
-  t.classList.add("show");
-  setTimeout(() => t.classList.remove("show"), 2800);
+  const t=document.getElementById("toast");
+  t.textContent=msg; t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"),3000);
 };
 </script>
 </body>
   </html>
-        
