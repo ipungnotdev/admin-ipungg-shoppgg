@@ -87,6 +87,9 @@ button.btn{padding:12px 20px;border:none;border-radius:10px;cursor:pointer;font-
     </div>
     <div class="login-attempts" id="attemptInfo"></div>
     <button class="btn btn-primary" id="loginBtn" onclick="loginAdmin()" style="margin-top:16px">🔐 LOGIN</button>
+    <div style="text-align:center;margin-top:10px">
+      <button onclick="resetLockout()" style="background:none;border:none;color:#8b7aaa;font-size:11px;cursor:pointer;text-decoration:underline">Reset jika kena lockout</button>
+    </div>
   </div>
 
   <!-- ADMIN PANEL -->
@@ -226,7 +229,17 @@ function updateAttemptInfo(){
   }
 }
 
-window.togglePw=function(){
+window.resetLockout=function(){
+  saveLoginData({attempts:0,lockedUntil:0});
+  clearInterval(lockoutInterval);
+  document.getElementById('lockoutTimer').style.display='none';
+  document.getElementById('loginBtn').disabled=false;
+  document.getElementById('loginEmail').disabled=false;
+  document.getElementById('loginPassword').disabled=false;
+  document.getElementById('attemptInfo').textContent='';
+  document.getElementById('loginStatus').className='status';
+  showToast('✅ Lockout direset!');
+};
   const inp=document.getElementById('loginPassword');
   const btn=document.getElementById('pwToggle');
   if(inp.type==='password'){ inp.type='text'; btn.textContent='🙈'; }
@@ -295,6 +308,7 @@ window.loginAdmin=async function(){
     else if(err.code==='auth/too-many-requests') msg='❌ Terlalu banyak percobaan. Tunggu beberapa saat.';
     else if(err.code==='auth/network-request-failed') msg='❌ Gagal koneksi. Cek internet kamu!';
     else if(err.code==='auth/invalid-email') msg='❌ Format email tidak valid!';
+    else msg=`❌ Error: ${err.code}`;
 
     if(nd.attempts>=MAX_ATTEMPTS){
       nd.lockedUntil=Date.now()+LOCKOUT_MS;
@@ -438,22 +452,4 @@ window.addCategory=async function(){
   }
 };
 
-window.deleteCategory=async function(id){
-  if(!confirm('Hapus kategori ini?'))return;
-  try{
-    await remove(ref(db,'store/categories/'+id));
-    showToast('🗑️ Kategori dihapus!');
-  } catch(e){showToast('❌ Gagal hapus: '+e.message);}
-};
-
-function renderCategories(){
-  const wrap=document.getElementById('categoryList');
-  const sel=document.getElementById('productCategory');
-  const cats=Object.values(storeData.categories||{});
-  const cur=sel.value;
-  sel.innerHTML='<option value="">-- Pilih Kategori --</option>';
-  cats.forEach(c=>sel.innerHTML+=`<option value="${c.name}">${c.name}</option>`);
-  sel.value=cur;
-  wrap.innerHTML=cats.length===0
-    ?'<div style="color:#8b7aaa;font-size:13px;padding:10px 0">Belum ada kategori.</div>'
-    :cats.map(c=
+window.delet
