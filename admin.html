@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ADMIN — IPUNGG SHOP</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',Arial,sans-serif; }
+body { background:#070312; color:white; padding:20px; min-height:100vh; }
+.container { max-width:900px; margin:auto; }
+.card { background:#120822; border:1px solid rgba(155,48,255,.25); padding:20px; border-radius:20px; margin-bottom:20px; }
+h1 { margin-bottom:20px; font-size:22px; background:linear-gradient(90deg,#bf5fff,#00f5ff); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+h2 { margin-bottom:16px; font-size:17px; color:#bf5fff; }
+label { display:block; font-size:12px; color:#8b7aaa; margin-bottom:4px; margin-top:12px; letter-spacing:0.05em; text-transform:uppercase; }
+input, select, textarea {
+  width:100%; padding:12px 14px; border:1px solid #2d1a4b; border-radius:10px;
+  background:#0b0515; color:white; outline:none; font-size:14px; transition:border 0.2s;
+}
+input:focus, select:focus { border-color:#9b30ff; }
+button.btn {
+  padding:12px 20px; border:none; border-radius:10px; cursor:pointer;
+  font-weight:700; font-size:13px; transition:all 0.2s; margin-top:8px;
+}
+.btn-primary { background:linear-gradient(135deg,#9b30ff,#00e5ff); color:white; width:100%; }
+.btn-primary:hover { opacity:0.9; box-shadow:0 0 20px rgba(155,48,255,0.5); }
+.btn-danger { background:#3d0a1a; border:1px solid #8b1a3a; color:#ff6b9d; padding:6px 12px; font-size:12px; margin:0; }
+.btn-danger:hover { background:#5c1028; }
+.btn-edit { background:#1a2a3d; border:1px solid #1a4a6b; color:#00f5ff; padding:6px 12px; font-size:12px; margin:0; }
+.btn-edit:hover { background:#1a3a5c; }
+.btn-logout { background:#1a0515; border:1px solid #4b1a2d; color:#ff6b9d; width:100%; margin-top:0; }
+.btn-logout:hover { background:#2a0825; }
+
+/* PRODUCT LIST */
+.product-card {
+  display:flex; gap:14px; align-items:center; padding:14px;
+  border-radius:14px; background:#0b0515; border:1px solid #24113d; margin-top:12px;
+  transition:border 0.2s;
+}
+.product-card:hover { border-color:#4b1a7b; }
+.product-card img { width:80px; height:80px; object-fit:cover; border-radius:10px; border:1px solid #2d1a4b; flex-shrink:0; }
+.product-card .no-img { width:80px; height:80px; background:#1a0533; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:32px; flex-shrink:0; }
+.product-info { flex:1; min-width:0; }
+.product-info h3 { font-size:15px; margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.product-info p { font-size:13px; color:#8b7aaa; margin-bottom:4px; }
+.product-info .price { color:#bf5fff; font-weight:700; font-family:monospace; }
+.pin-badge { display:inline-block; padding:3px 10px; border-radius:20px; background:#ffb300; color:black; font-size:11px; font-weight:bold; }
+.card-actions { display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
+
+/* CATEGORY */
+.category-item { padding:10px 14px; border-radius:10px; background:#0b0515; border:1px solid #24113d; margin-top:8px; display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.category-item span { font-size:14px; font-weight:600; }
+
+/* BANNER PREVIEW */
+.preview-banner { margin-top:14px; overflow:hidden; border-radius:14px; border:1px solid #2d1a4b; }
+.preview-banner img, .preview-banner video { width:100%; max-height:250px; object-fit:cover; display:block; }
+
+/* TOAST */
+.toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(60px); background:linear-gradient(135deg,#9b30ff,#00f5ff); color:#fff; padding:12px 24px; border-radius:30px; font-weight:700; font-size:13px; z-index:999; transition:transform 0.3s; white-space:nowrap; pointer-events:none; }
+.toast.show { transform:translateX(-50%) translateY(0); }
+
+/* STATUS */
+.status-bar { padding:10px 14px; border-radius:10px; margin-bottom:16px; font-size:13px; font-weight:600; display:none; }
+.status-bar.ok { background:rgba(0,255,100,0.1); border:1px solid rgba(0,255,100,0.3); color:#00ff64; display:block; }
+.status-bar.err { background:rgba(255,50,80,0.1); border:1px solid rgba(255,50,80,0.3); color:#ff6b9d; display:block; }
+
+#adminPanel { display:none; }
+.loading { color:#8b7aaa; font-size:13px; padding:20px 0; text-align:center; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- LOGIN -->
+  <div class="card" id="loginBox">
+    <h1>🔐 LOGIN ADMIN</h1>
+    <div id="loginStatus" class="status-bar"></div>
+    <label>Email</label>
+    <input type="email" id="loginEmail" placeholder="admin@email.com">
+    <label>Password</label>
+    <input type="password" id="loginPassword" placeholder="Password..." onkeydown="if(event.key==='Enter')loginAdmin()">
+    <button class="btn btn-primary" onclick="loginAdmin()">LOGIN</button>
+  </div>
+
+  <!-- ADMIN PANEL -->
+  <div id="adminPanel">
+
+    <!-- SETTINGS -->
+    <div class="card">
+      <h1>⚙️ IPUNGG SHOP — ADMIN</h1>
+      <div id="settingsStatus" class="status-bar"></div>
+
+      <label>Nama Store</label>
+      <input type="text" id="storeName" placeholder="IPUNGG SHOP">
+
+      <label>URL Banner (gambar atau .mp4)</label>
+      <input type="text" id="bannerUrl" placeholder="https://...">
+
+      <label>Nomor WA Admin (contoh: 6281234567890)</label>
+      <input type="text" id="urlAdmin" placeholder="6285198959920">
+
+      <label>URL Channel WhatsApp</label>
+      <input type="text" id="urlChannel" placeholder="https://whatsapp.com/channel/...">
+
+      <label>URL Grup WhatsApp</label>
+      <input type="text" id="urlGroup" placeholder="https://chat.whatsapp.com/...">
+
+      <button class="btn btn-primary" onclick="saveSettings()">💾 SIMPAN SETTINGS</button>
+      <div class="preview-banner" id="bannerPreview"></div>
+    </div>
+
+    <!-- KATEGORI -->
+    <div class="card">
+      <h2>📂 TAMBAH KATEGORI</h2>
+      <div id="catStatus" class="status-bar"></div>
+      <label>Nama Kategori</label>
+      <input type="text" id="categoryName" placeholder="Contoh: Voucher, Diamond, Item..." onkeydown="if(event.key==='Enter')addCategory()">
+      <button class="btn btn-primary" onclick="addCategory()">✦ TAMBAH KATEGORI</button>
+      <div id="categoryList" style="margin-top:16px"><div class="loading">Memuat kategori...</div></div>
+    </div>
+
+    <!-- PRODUK -->
+    <div class="card">
+      <h2>📦 TAMBAH PRODUK</h2>
+      <div id="prodStatus" class="status-bar"></div>
+
+      <label>Nama Produk</label>
+      <input type="text" id="productName" placeholder="Nama produk...">
+
+      <label>Harga (Rp)</label>
+      <input type="number" id="productPrice" placeholder="50000">
+
+      <label>URL Thumbnail</label>
+      <input type="text" id="productThumbnail" placeholder="https://...">
+
+      <label>Kategori</label>
+      <select id="productCategory">
+        <option value="">Pilih Kategori</option>
+      </select>
+
+      <div style="display:flex;align-items:center;gap:10px;margin-top:14px">
+        <input type="checkbox" id="productPin" style="width:auto;transform:scale(1.3)">
+        <label for="productPin" style="margin:0;text-transform:none;font-size:14px;color:white">📌 Pin Produk (tampil di atas)</label>
+      </div>
+
+      <button class="btn btn-primary" onclick="addProduct()">✦ TAMBAH PRODUK</button>
+
+      <div id="productList" style="margin-top:16px"><div class="loading">Memuat produk...</div></div>
+    </div>
+
+    <div class="card" style="padding:16px">
+      <button class="btn btn-logout" onclick="logoutAdmin()">🚪 LOGOUT</button>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, set, remove, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA9tSehgxD2Pgb7YPy7Pq-_bcuKLKswyos",
+  authDomain: "ipung-store-2b96d.firebaseapp.com",
+  databaseURL: "https://ipung-store-2b96d-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "ipung-store-2b96d",
+  storageBucket: "ipung-store-2b96d.firebasestorage.app",
+  messagingSenderId: "906202337063",
+  appId: "1:906202337063:web:1a39b7bad99a85b23c2302"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const auth = getAuth(app);
+
+let storeData = { settings:{}, categories:{}, products:{} };
+
+// ===== AUTH =====
+window.loginAdmin = async function() {
+  const email = document.getElementById("loginEmail").value.trim();
+  const pass = document.getElementById("loginPassword").value;
+  const status = document.getElementById("loginStatus");
+  if (!email || !pass) { showStatus(status, "err", "Isi email dan password!"); return; }
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+  } catch(err) {
+    const msg = err.code === 'auth/invalid-credential' ? "Email atau password salah!"
+               : err.code === 'auth/too-many-requests' ? "Terlalu banyak percobaan. Tunggu sebentar."
+               : err.message;
+    showStatus(status, "err", msg);
+  }
+};
+
+window.logoutAdmin = async function() {
+  await signOut(auth);
+};
+
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    document.getElementById("loginBox").style.display = "none";
+    document.getElementById("adminPanel").style.display = "block";
+    loadStore();
+  } else {
+    document.getElementById("loginBox").style.display = "block";
+    document.getElementById("adminPanel").style.display = "none";
+  }
+});
+
+// ===== LOAD =====
+function loadStore() {
+  onValue(ref(db, "store"), (snapshot) => {
+    storeData = snapshot.val() || { settings:{}, categories:{}, products:{} };
+    renderSettings();
+    renderBanner();
+    renderCategories();
+    renderProducts();
+  });
+}
+
+// ===== SETTINGS =====
+function renderSettings() {
+  const s = storeData.settings || {};
+  document.getElementById("storeName").value = s.storeName || "";
+  document.getElementById("bannerUrl").value = s.banner || "";
+  document.getElementById("urlAdmin").value = s.urlAdmin || "";
+  document.getElementById("urlChannel").value = s.urlChannel || "";
+  document.getElementById("urlGroup").value = s.urlGroup || "";
+}
+
+function renderBanner() {
+  const preview = document.getElementById("bannerPreview");
+  const banner = storeData.settings?.banner || "";
+  if (!banner) { preview.innerHTML = ""; return; }
+  if (banner.includes(".mp4")) {
+    preview.innerHTML = `<video autoplay muted loop controls><source src="${banner}" type="video/mp4"></video>`;
+  } else {
+    preview.innerHTML = `<img src="${banner}" alt="Banner">`;
+  }
+}
+
+window.saveSettings = async function() {
+  const status = document.getElementById("settingsStatus");
+  const settings = {
+    storeName: document.getElementById("storeName").value.trim(),
+    banner: document.getElementById("bannerUrl").value.trim(),
+    urlAdmin: document.getElementById("urlAdmin").value.trim(),
+    urlChannel: document.getElementById("urlChannel").value.trim(),
+    urlGroup: document.getElementById("urlGroup").value.trim(),
+  };
+  try {
+    await set(ref(db, "store/settings"), settings);
+    showStatus(status, "ok", "✅ Settings berhasil disimpan!");
+    showToast("✅ Settings disimpan!");
+  } catch(e) {
+    showStatus(status, "err", "❌ Gagal: " + e.message);
+  }
+};
+
+// ===== CATEGORY =====
+window.addCategory = async function() {
+  const status = document.getElementById("catStatus");
+  const name = document.getElementById("categoryName").value.trim();
+  if (!name) { showStatus(status, "err", "Isi nama kategori!"); return; }
+  const id = Date.now();
+  try {
+    await set(ref(db, "store/categories/" + id), { id, name });
+    document.getElementById("categoryName").value = "";
+    showStatus(status, "ok", "✅ Kategori berhasil ditambahkan!");
+    showToast("✅ Kategori ditambahkan!");
+  } catch(e) {
+    showStatus(status, "err", "❌ Gagal: " + e.message);
+  }
+};
+
+window.deleteCategory = async function(id) {
+  if (!confirm("Hapus kategori ini?")) return;
+  await remove(ref(db, "store/categories/" + id));
+  showToast("🗑️ Kategori dihapus!");
+};
+
+function renderCategories() {
+  const wrap = document.getElementById("categoryList");
+  const select = document.getElementById("productCategory");
+  const cats = Object.values(storeData.categories || {});
+
+  select.innerHTML = `<option value="">Pilih Kategori</option>`;
+  cats.forEach(cat => {
+    select.innerHTML += `<option value="${cat.name}">${cat.name}</option>`;
+  });
+
+  if (cats.length === 0) {
+    wrap.innerHTML = `<div style="color:#8b7aaa;font-size:13px;padding:10px 0">Belum ada kategori</div>`;
+    return;
+  }
+  wrap.innerHTML = cats.map(cat => `
+    <div class="category-item">
+      <span>📂 ${cat.name}</span>
+      <button class="btn btn-danger" onclick="deleteCategory('${cat.id}')">🗑️ Hapus</button>
+    </div>
+  `).join('');
+}
+
+// ===== PRODUCT =====
+window.addProduct = async function() {
+  const status = document.getElementById("prodStatus");
+  const name = document.getElementById("productName").value.trim();
+  const price = document.getElementById("productPrice").value.trim();
+  const thumbnail = document.getElementById("productThumbnail").value.trim();
+  const category = document.getElementById("productCategory").value;
+  const pinned = document.getElementById("productPin").checked;
+
+  if (!name || !price || !category) {
+    showStatus(status, "err", "⚠️ Nama, harga, dan kategori wajib diisi!"); return;
+  }
+
+  const id = Date.now();
+  const product = { id, name, price: Number(price), thumbnail, category, pinned, createdAt: id };
+
+  try {
+    await set(ref(db, "store/products/" + id), product);
+    document.getElementById("productName").value = "";
+    document.getElementById("productPrice").value = "";
+    document.getElementById("productThumbnail").value = "";
+    document.getElementById("productCategory").value = "";
+    document.getElementById("productPin").checked = false;
+    showStatus(status, "ok", "✅ Produk berhasil ditambahkan!");
+    showToast("✅ Produk ditambahkan!");
+  } catch(e) {
+    showStatus(status, "err", "❌ Gagal: " + e.message);
+  }
+};
+
+window.deleteProduct = async function(id) {
+  if (!confirm("Hapus produk ini?")) return;
+  await remove(ref(db, "store/products/" + id));
+  showToast("🗑️ Produk dihapus!");
+};
+
+window.togglePin = async function(id, current) {
+  await update(ref(db, "store/products/" + id), { pinned: !current });
+  showToast(current ? "📌 Unpin" : "📌 Produk di-pin!");
+};
+
+function renderProducts() {
+  const wrap = document.getElementById("productList");
+  const prods = Object.values(storeData.products || {});
+
+  if (prods.length === 0) {
+    wrap.innerHTML = `<div style="color:#8b7aaa;font-size:13px;padding:10px 0">Belum ada produk</div>`;
+    return;
+  }
+
+  prods.sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0) || b.id - a.id);
+
+  wrap.innerHTML = prods.map(p => `
+    <div class="product-card">
+      ${p.thumbnail
+        ? `<img src="${p.thumbnail}" alt="${p.name}" onerror="this.style.display='none'">`
+        : `<div class="no-img">📦</div>`
+      }
+      <div class="product-info">
+        <h3>${p.name}</h3>
+        <p class="price">Rp ${Number(p.price).toLocaleString('id-ID')}</p>
+        <p>${p.category}</p>
+        ${p.pinned ? '<span class="pin-badge">📌 PINNED</span>' : ''}
+        <div class="card-actions">
+          <button class="btn btn-edit" onclick="togglePin('${p.id}', ${!!p.pinned})">
+            ${p.pinned ? '📌 Unpin' : '📌 Pin'}
+          </button>
+          <button class="btn btn-danger" onclick="deleteProduct('${p.id}')">🗑️ Hapus</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ===== HELPERS =====
+function showStatus(el, type, msg) {
+  el.className = "status-bar " + type;
+  el.textContent = msg;
+  setTimeout(() => { el.className = "status-bar"; }, 4000);
+}
+
+window.showToast = function(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2800);
+};
+</script>
+</body>
+</html>
